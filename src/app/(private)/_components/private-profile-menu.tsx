@@ -1,0 +1,99 @@
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, LogOut, Settings } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+interface PrivateProfileMenuProps {
+  realName: string
+  userName: string
+  settingsHref: string
+  onLogout: () => Promise<void>
+}
+
+export function PrivateProfileMenu({
+  realName,
+  userName,
+  settingsHref,
+  onLogout,
+}: PrivateProfileMenuProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement | null>(null)
+  const displayName = realName.trim() || userName
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent): void {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onClick={() => setIsOpen((current) => !current)}
+        className="font-heading inline-flex h-[50px] items-center gap-2 rounded-full border border-black/10 bg-white px-5 text-[0.96rem] font-semibold text-[#181818] shadow-[0_10px_24px_-24px_rgba(0,0,0,0.28)] transition-colors hover:bg-[#fbfbfb]"
+      >
+        <span>Olá, {displayName}</span>
+        <ChevronDown
+          className={`h-4 w-4 text-[#666] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {isOpen ? (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-20 mt-4 w-[224px] overflow-hidden rounded-[18px] border border-black/10 bg-white shadow-[0_24px_42px_-28px_rgba(0,0,0,0.34)]"
+        >
+          <div className="px-4 py-3.5">
+            <p className="font-heading text-[1.12rem] font-semibold text-[#181818]">{displayName}</p>
+            <p className="font-heading mt-1 text-[0.92rem] font-normal text-[#6f6f6f]">
+              @{userName}
+            </p>
+          </div>
+
+          <div className="border-t border-black/10">
+            <Link
+              to={settingsHref}
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="font-heading flex items-center gap-3 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+            >
+              <Settings className="h-4 w-4" />
+              <span>Configurações</span>
+            </Link>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsOpen(false)
+                void onLogout()
+              }}
+              className="font-heading flex w-full items-center gap-3 border-t border-black/10 px-4 py-3.5 text-left text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sair</span>
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
+}
