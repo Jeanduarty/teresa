@@ -4,6 +4,7 @@ import type {
   ContentTopicFilters,
   ContentTopicGroup,
   ContentTopicMetrics,
+  LinkPreview,
   UpdateContentTopicInput,
 } from '../shared/types/account-types'
 
@@ -48,6 +49,14 @@ export const contentTopicsService = {
   async getMetrics(): Promise<ContentTopicMetrics> {
     const { metrics } = await apiRequest<{ metrics: ContentTopicMetrics }>('/topics/metrics')
     return metrics
+  },
+
+  async getLinkPreview(url: string): Promise<LinkPreview> {
+    const params = new URLSearchParams({ url })
+    const { preview } = await apiRequest<{ preview: LinkPreview }>(
+      `/topics/link-preview?${params.toString()}`,
+    )
+    return preview
   },
 
   async markTopicDone({ topicId }: { userId: string; topicId: string }): Promise<ContentTopic> {
@@ -121,6 +130,7 @@ export const contentTopicsService = {
     const { topic } = await apiRequest<{ topic: ContentTopic }>(`/topics/${topicId}/groups/${groupId}`, {
       method: 'DELETE',
     })
+
     return topic
   },
 

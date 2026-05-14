@@ -22,7 +22,7 @@ export function GroupsGrid({
         <div>
           <h2 className="font-heading text-2xl font-semibold text-[#141414]">Grupos</h2>
           <p className="mt-1 text-sm leading-6 text-[#666]">
-            Organize os topicos em colecoes reutilizaveis.
+            Organize os tópicos em coleções reutilizáveis.
           </p>
         </div>
         <Button

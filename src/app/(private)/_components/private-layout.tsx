@@ -1,12 +1,14 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 import { useAuthSession, useLogout } from '../../../hooks/use-auth'
+import { useUserAvatar } from '../../../hooks/use-user-avatar'
 import { Logo } from '../../../shared/branding/logo'
 import { PrivateProfileMenu } from './private-profile-menu'
 
 export function PrivateLayout() {
   const navigate = useNavigate()
   const { user } = useAuthSession()
+  const avatarQuery = useUserAvatar(user)
   const logoutMutation = useLogout()
 
   async function handleLogout(): Promise<void> {
@@ -29,6 +31,7 @@ export function PrivateLayout() {
             <PrivateProfileMenu
               realName={user.realName}
               userName={user.userName}
+              avatarUrl={avatarQuery.avatarUrl}
               settingsHref="/settings/profile"
               onLogout={handleLogout}
             />

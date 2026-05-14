@@ -13,6 +13,7 @@ import {
 import { Link } from 'react-router-dom'
 
 import { Button } from '../../../components/ui'
+import { UserAvatar } from '../../../components/user-avatar'
 import { ACCOUNT_SECTIONS, getAccountSectionHref } from './account-settings-utils'
 import type { AccountSectionId } from './account-settings-types'
 
@@ -20,6 +21,7 @@ interface AccountSettingsSidebarProps {
   slug: string
   realName: string
   userName: string
+  avatarUrl?: string | null
   activeSection: AccountSectionId
 }
 
@@ -34,6 +36,7 @@ const SECTION_ICONS: Record<AccountSectionId, LucideIcon> = {
 interface SidebarProfileSummaryProps {
   realName: string
   userName: string
+  avatarUrl?: string | null
 }
 
 interface SidebarNavigationProps {
@@ -42,14 +45,17 @@ interface SidebarNavigationProps {
   onNavigate?: () => void
 }
 
-function SidebarProfileSummary({ realName, userName }: SidebarProfileSummaryProps) {
+function SidebarProfileSummary({ realName, userName, avatarUrl }: SidebarProfileSummaryProps) {
   const displayName = realName.trim() || userName
 
   return (
     <div className="mb-9 flex items-center gap-4">
-      <div className="app-icon-badge-user flex h-[54px] w-[54px] items-center justify-center rounded-full border border-white/60 shadow-[0_8px_24px_-20px_rgba(0,0,0,0.28)]">
-        <User className="h-6 w-6 text-white" strokeWidth={2} />
-      </div>
+      <UserAvatar
+        avatarUrl={avatarUrl}
+        name={displayName}
+        className="h-[54px] w-[54px] border border-white/60 shadow-[0_8px_24px_-20px_rgba(0,0,0,0.28)]"
+        iconClassName="h-6 w-6"
+      />
 
       <div className="min-w-0">
         <h1 className="truncate font-heading text-[1.18rem] font-semibold leading-none text-[#191919]">
@@ -101,6 +107,7 @@ export function AccountSettingsSidebar({
   slug,
   realName,
   userName,
+  avatarUrl,
   activeSection,
 }: AccountSettingsSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -135,7 +142,7 @@ export function AccountSettingsSidebar({
             id="account-settings-mobile-menu"
             className="mt-4 rounded-[20px] border border-black/10 bg-white p-4 shadow-[0_18px_34px_-26px_rgba(0,0,0,0.28)]"
           >
-            <SidebarProfileSummary realName={realName} userName={userName} />
+            <SidebarProfileSummary realName={realName} userName={userName} avatarUrl={avatarUrl} />
             <div className="space-y-8">
               <SidebarNavigation
                 slug={slug}
@@ -148,7 +155,7 @@ export function AccountSettingsSidebar({
       </div>
 
       <div className="hidden lg:block">
-        <SidebarProfileSummary realName={realName} userName={userName} />
+        <SidebarProfileSummary realName={realName} userName={userName} avatarUrl={avatarUrl} />
         <div className="space-y-8">
           <SidebarNavigation slug={slug} activeSection={activeSection} />
         </div>

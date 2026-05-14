@@ -30,7 +30,6 @@ export const authService = {
     })
 
     writeAuthToken(response.token)
-    console.log(response)
 
     return response
   },

@@ -124,6 +124,26 @@ export function useAccountSettings({
     },
   })
 
+  const uploadProfileAvatarMutation = useMutation<AuthUser, Error, File>({
+    mutationFn: settingsService.uploadProfileAvatar,
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData<AuthUser | null>(['session'], updatedUser)
+      syncProfileCache(slug, updatedUser)
+      syncProfileCache(updatedUser.userName, updatedUser)
+      void queryClient.invalidateQueries({ queryKey: ['user-avatar', updatedUser.id] })
+    },
+  })
+
+  const removeProfileAvatarMutation = useMutation<AuthUser, Error, void>({
+    mutationFn: settingsService.removeProfileAvatar,
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData<AuthUser | null>(['session'], updatedUser)
+      syncProfileCache(slug, updatedUser)
+      syncProfileCache(updatedUser.userName, updatedUser)
+      void queryClient.invalidateQueries({ queryKey: ['user-avatar', updatedUser.id] })
+    },
+  })
+
   return {
     profileQuery,
     sessionsQuery,
@@ -131,5 +151,7 @@ export function useAccountSettings({
     requestEmailChangeMutation,
     changePasswordMutation,
     requestAccountDeletionMutation,
+    uploadProfileAvatarMutation,
+    removeProfileAvatarMutation,
   }
 }

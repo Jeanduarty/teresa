@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 
 import { useAuthSession } from '../../../hooks/use-auth'
+import { useUserAvatar } from '../../../hooks/use-user-avatar'
 import type { PublicProfile } from '../../../shared/types/account-types'
 import { useAccountSettings } from '../../../hooks/use-account-settings'
 import { AccountSettingsDangerSection } from './account-settings-danger-section'
@@ -82,6 +83,7 @@ export function AccountSettingsPage() {
   const { section } = useParams<{ section?: string }>()
   const navigate = useNavigate()
   const { user, isLoading: isSessionLoading } = useAuthSession()
+  const avatarQuery = useUserAvatar(user)
   const activeSection: AccountSectionId = isAccountSection(section) ? section : 'profile'
   const [sessionsPage, setSessionsPage] = useState(1)
   const settings = useAccountSettings({
@@ -376,12 +378,13 @@ export function AccountSettingsPage() {
             Voltar para inicio
           </Link>
 
-          <AccountSettingsSidebar
-            slug={currentProfile.userName}
-            realName={currentProfile.realName}
-            userName={currentProfile.userName}
-            activeSection={activeSection}
-          />
+            <AccountSettingsSidebar
+              slug={currentProfile.userName}
+              realName={currentProfile.realName}
+              userName={currentProfile.userName}
+              avatarUrl={avatarQuery.avatarUrl}
+              activeSection={activeSection}
+            />
         </aside>
 
         <section className="min-w-0 w-full rounded-[22px] border border-black/10 bg-white px-8 py-8 md:px-8 md:py-8 lg:w-[780px]">
@@ -393,7 +396,23 @@ export function AccountSettingsPage() {
               canSubmit={canSubmitProfile}
               errorMessage={settings.updateProfileMutation.error?.message}
               successMessage={profileSuccessMessage}
+              avatarUrl={avatarQuery.avatarUrl}
+              avatarErrorMessage={
+                settings.uploadProfileAvatarMutation.error?.message ||
+                settings.removeProfileAvatarMutation.error?.message ||
+                avatarQuery.error?.message
+              }
+              isUploadingAvatar={settings.uploadProfileAvatarMutation.isPending}
+              isRemovingAvatar={settings.removeProfileAvatarMutation.isPending}
               onChange={handleProfileChange}
+              onAvatarChange={(file) => {
+                settings.uploadProfileAvatarMutation.reset()
+                void settings.uploadProfileAvatarMutation.mutateAsync(file)
+              }}
+              onAvatarRemove={() => {
+                settings.removeProfileAvatarMutation.reset()
+                void settings.removeProfileAvatarMutation.mutateAsync()
+              }}
               onSubmit={handleProfileSubmit}
             />
           ) : null}

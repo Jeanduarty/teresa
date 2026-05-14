@@ -42,7 +42,7 @@ export type TopicCardActions = {
   onMarkDone: (topicId: string) => void
   onMarkPending: (topicId: string) => void
   onAddToGroup?: (topicId: string, groupId: string) => void
-  onRemoveFromGroup?: (topicId: string, groupId: string) => void
+  onRemoveFromGroup: (topicId: string, groupId: string) => void
 }
 
 export type TopicListActionState = {

@@ -1,9 +1,14 @@
 import { clearAuthToken, readAuthToken } from './auth-token-storage'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3333'
+export const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3333'
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown
+  auth?: boolean
+}
+
+interface RawRequestOptions extends Omit<RequestInit, 'body'> {
+  body?: BodyInit | null
   auth?: boolean
 }
 
@@ -53,4 +58,61 @@ export async function apiRequest<TResponse>(
   }
 
   return payload as TResponse
+}
+
+export async function apiRawRequest<TResponse>(
+  path: string,
+  { body, auth = true, headers, ...options }: RawRequestOptions = {},
+): Promise<TResponse> {
+  const token = readAuthToken()
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    },
+    body,
+  })
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      clearAuthToken()
+    }
+
+    const errorPayload = await response.json().catch(() => null)
+    throw new Error(errorPayload?.message ?? 'Erro ao comunicar com o servidor')
+  }
+
+  const payload = (await response.json()) as unknown
+
+  if (isApiSuccessResponse<TResponse>(payload)) {
+    return payload.data
+  }
+
+  return payload as TResponse
+}
+
+export async function apiBlobRequest(
+  path: string,
+  { auth = true, headers, ...options }: Omit<RawRequestOptions, 'body'> = {},
+): Promise<Blob> {
+  const token = readAuthToken()
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    },
+  })
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      clearAuthToken()
+    }
+
+    const errorPayload = await response.json().catch(() => null)
+    throw new Error(errorPayload?.message ?? 'Erro ao comunicar com o servidor')
+  }
+
+  return response.blob()
 }

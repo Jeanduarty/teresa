@@ -1,4 +1,4 @@
-import { apiRequest } from '../shared/lib/api-client'
+import { apiBlobRequest, apiRawRequest, apiRequest } from '../shared/lib/api-client'
 import type {
   AuthUser,
   ChangePasswordInput,
@@ -65,5 +65,33 @@ export const settingsService = {
       method: 'POST',
       body: { password },
     })
+  },
+
+  async getProfileAvatar(): Promise<Blob> {
+    return apiBlobRequest('/settings/avatar')
+  },
+
+  async uploadProfileAvatar(file: File): Promise<AuthUser> {
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error('A imagem precisa ter no máximo 10MB')
+    }
+
+    const { user } = await apiRawRequest<{ user: AuthUser }>('/settings/avatar', {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    })
+
+    return user
+  },
+
+  async removeProfileAvatar(): Promise<AuthUser> {
+    const { user } = await apiRequest<{ user: AuthUser }>('/settings/avatar', {
+      method: 'DELETE',
+    })
+
+    return user
   },
 }

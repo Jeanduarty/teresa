@@ -3,10 +3,12 @@ import { ChevronDown, LogOut, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { Button } from '../../../components/ui'
+import { UserAvatar } from '../../../components/user-avatar'
 
 interface PrivateProfileMenuProps {
   realName: string
   userName: string
+  avatarUrl?: string | null
   settingsHref: string
   onLogout: () => Promise<void>
 }
@@ -14,6 +16,7 @@ interface PrivateProfileMenuProps {
 export function PrivateProfileMenu({
   realName,
   userName,
+  avatarUrl,
   settingsHref,
   onLogout,
 }: PrivateProfileMenuProps) {
@@ -52,6 +55,12 @@ export function PrivateProfileMenu({
         variant="secondary"
         className="font-heading h-[50px] rounded-full px-5 text-[0.96rem] text-[#181818] shadow-[0_10px_24px_-24px_rgba(0,0,0,0.28)] hover:bg-[#fbfbfb]"
       >
+        <UserAvatar
+          avatarUrl={avatarUrl}
+          name={displayName}
+          className="-ml-2 h-9 w-9"
+          iconClassName="h-4 w-4"
+        />
         <span>Olá, {displayName}</span>
         <ChevronDown
           className={`h-4 w-4 text-[#666] transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -64,6 +73,14 @@ export function PrivateProfileMenu({
           className="absolute right-0 top-full z-20 mt-4 w-[224px] overflow-hidden rounded-[18px] border border-black/10 bg-white shadow-[0_24px_42px_-28px_rgba(0,0,0,0.34)]"
         >
           <div className="px-4 py-3.5">
+            <div className="mb-3">
+              <UserAvatar
+                avatarUrl={avatarUrl}
+                name={displayName}
+                className="h-11 w-11"
+                iconClassName="h-5 w-5"
+              />
+            </div>
             <p className="font-heading text-[1.12rem] font-semibold text-[#181818]">{displayName}</p>
             <p className="font-heading mt-1 text-[0.92rem] font-normal text-[#6f6f6f]">
               @{userName}

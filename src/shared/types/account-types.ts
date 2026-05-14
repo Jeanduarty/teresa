@@ -11,6 +11,8 @@ export interface AuthUser {
   realName: string
   userName: string
   status: 'active' | 'inactive' | 'deleted'
+  profileUrl: string | null
+  secretKeyId: string | null
   isVerified: boolean
   createdAt: string
   pendingEmail: string | null
@@ -184,6 +186,15 @@ export interface ContentTopicMetrics {
   twitterSignals: number
   tiktokSignals: number
   completionRate: number
+}
+
+export type LinkPreviewKind = 'image' | 'video' | 'gif' | 'link'
+
+export interface LinkPreview {
+  url: string
+  resolvedUrl: string
+  contentType: string | null
+  kind: LinkPreviewKind
 }
 
 export interface SocialActivityPost {

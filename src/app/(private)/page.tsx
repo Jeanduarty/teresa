@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, Folder, Grid3X3, User } from 'lucide-react'
+import { ChevronLeft, Folder, Grid3X3 } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -13,6 +13,8 @@ import {
 import { useAuthSession } from '../../hooks/use-auth'
 import { useContentTopics, useTopicGroups } from '../../hooks/use-content-topics'
 import { useSocialAccounts } from '../../hooks/use-social-accounts'
+import { useUserAvatar } from '../../hooks/use-user-avatar'
+import { UserAvatar } from '../../components/user-avatar'
 import type {
   ContentTopicFilters,
   ContentTopicStatusFilter,
@@ -39,6 +41,7 @@ export function HomePage() {
   const location = useLocation()
   const { groupId } = useParams<{ groupId?: string }>()
   const { user } = useAuthSession()
+  const avatarQuery = useUserAvatar(user)
   const [groupDialogState, setGroupDialogState] = useState<GroupDialogState>(null)
   const [titleFilter, setTitleFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState<ContentTopicStatusFilter>('all')
@@ -247,9 +250,12 @@ export function HomePage() {
     <main className="mx-auto w-full max-w-[1200px] px-6 py-12 md:px-10">
       <section className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-6">
-          <div className="app-icon-badge-user flex h-24 w-24 shrink-0 items-center justify-center rounded-full">
-            <User className="h-12 w-12 text-white" strokeWidth={2} />
-          </div>
+          <UserAvatar
+            avatarUrl={avatarQuery.avatarUrl}
+            name={user?.realName?.trim() || user?.userName || 'Criador'}
+            className="h-24 w-24"
+            iconClassName="h-12 w-12"
+          />
 
           <div className="min-w-0">
             <h1 className="font-heading mb-1 text-3xl font-bold text-[#141414]">
@@ -266,7 +272,7 @@ export function HomePage() {
               </Link>
             </div>
             <p className="mt-4 max-w-[720px] text-base leading-7 text-[#666]">
-              Topicos gerados automaticamente a partir dos sinais de curtidas e salvos das redes sociais.
+              Topicos gerados automaticamente a partir das curtidas das redes sociais.
             </p>
           </div>
         </div>
