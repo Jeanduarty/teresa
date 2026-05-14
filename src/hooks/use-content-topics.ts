@@ -18,6 +18,70 @@ function updateTopicInCachedLists(userId: string | undefined, updatedTopic: Cont
   )
 }
 
+function getCachedTopic(userId: string | undefined, topicId: string): ContentTopic | undefined {
+  const topicFromDetail = queryClient.getQueryData<ContentTopic>(['content-topics', userId, topicId])
+
+  if (topicFromDetail) {
+    return topicFromDetail
+  }
+
+  const topicLists = queryClient.getQueriesData<ContentTopic[]>({
+    queryKey: ['content-topics', userId, 'list'],
+  })
+
+  for (const [, topics] of topicLists) {
+    const topic = topics?.find((currentTopic) => currentTopic.id === topicId)
+
+    if (topic) {
+      return topic
+    }
+  }
+
+  return undefined
+}
+
+function updateMetricsInCache({
+  userId,
+  previousTopic,
+  updatedTopic,
+}: {
+  userId: string | undefined
+  previousTopic?: ContentTopic
+  updatedTopic: ContentTopic
+}) {
+  queryClient.setQueryData<ContentTopicMetrics>(
+    ['content-topics', 'metrics', userId],
+    (currentMetrics) => {
+      if (!currentMetrics) {
+        return currentMetrics
+      }
+
+      const previousStatus = previousTopic?.status ?? null
+      const nextStatus = updatedTopic.status
+
+      if (previousStatus === nextStatus) {
+        return currentMetrics
+      }
+
+      const completedDelta =
+        (nextStatus === 'completed' ? 1 : 0) - (previousStatus === 'completed' ? 1 : 0)
+      const pendingDelta =
+        (nextStatus === 'pending' ? 1 : 0) - (previousStatus === 'pending' ? 1 : 0)
+      const total = Math.max(0, currentMetrics.total)
+      const completed = Math.max(0, currentMetrics.completed + completedDelta)
+      const pending = Math.max(0, currentMetrics.pending + pendingDelta)
+
+      return {
+        ...currentMetrics,
+        total,
+        completed,
+        pending,
+        completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+      }
+    },
+  )
+}
+
 export function useContentTopics(userId?: string, filters?: ContentTopicFilters) {
   const topicsQuery = useQuery<ContentTopic[], Error>({
     queryKey: ['content-topics', userId, 'list', filters],
@@ -53,10 +117,11 @@ export function useContentTopics(userId?: string, filters?: ContentTopicFilters)
 
       return contentTopicsService.markTopicDone({ userId, topicId })
     },
-    onSuccess: (updatedTopic) => {
+    onSuccess: (updatedTopic, topicId) => {
+      const previousTopic = getCachedTopic(userId, topicId)
       queryClient.setQueryData<ContentTopic>(['content-topics', userId, updatedTopic.id], updatedTopic)
       updateTopicInCachedLists(userId, updatedTopic)
-      void queryClient.invalidateQueries({ queryKey: ['content-topics', 'metrics', userId] })
+      updateMetricsInCache({ userId, previousTopic, updatedTopic })
     },
   })
 
@@ -68,10 +133,11 @@ export function useContentTopics(userId?: string, filters?: ContentTopicFilters)
 
       return contentTopicsService.markTopicPending({ userId, topicId })
     },
-    onSuccess: (updatedTopic) => {
+    onSuccess: (updatedTopic, topicId) => {
+      const previousTopic = getCachedTopic(userId, topicId)
       queryClient.setQueryData<ContentTopic>(['content-topics', userId, updatedTopic.id], updatedTopic)
       updateTopicInCachedLists(userId, updatedTopic)
-      void queryClient.invalidateQueries({ queryKey: ['content-topics', 'metrics', userId] })
+      updateMetricsInCache({ userId, previousTopic, updatedTopic })
     },
   })
 
@@ -205,9 +271,10 @@ export function useContentTopicDetail({ userId, topicId }: { userId?: string; to
       return contentTopicsService.markTopicDone({ userId, topicId })
     },
     onSuccess: (updatedTopic) => {
+      const previousTopic = getCachedTopic(userId, topicId ?? updatedTopic.id)
       queryClient.setQueryData<ContentTopic>(['content-topics', userId, topicId], updatedTopic)
       updateTopicInCachedLists(userId, updatedTopic)
-      void queryClient.invalidateQueries({ queryKey: ['content-topics', 'metrics', userId] })
+      updateMetricsInCache({ userId, previousTopic, updatedTopic })
     },
   })
 
@@ -220,9 +287,10 @@ export function useContentTopicDetail({ userId, topicId }: { userId?: string; to
       return contentTopicsService.markTopicPending({ userId, topicId })
     },
     onSuccess: (updatedTopic) => {
+      const previousTopic = getCachedTopic(userId, topicId ?? updatedTopic.id)
       queryClient.setQueryData<ContentTopic>(['content-topics', userId, topicId], updatedTopic)
       updateTopicInCachedLists(userId, updatedTopic)
-      void queryClient.invalidateQueries({ queryKey: ['content-topics', 'metrics', userId] })
+      updateMetricsInCache({ userId, previousTopic, updatedTopic })
     },
   })
 

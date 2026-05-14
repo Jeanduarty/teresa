@@ -11,6 +11,8 @@ const buttonVariants = tv({
     variant: {
       primary: 'app-btn-primary',
       secondary: 'app-btn-secondary',
+      outline:
+        'border border-black/10 bg-white text-[#181818] hover:border-black/20 hover:bg-[#fbfbfa]',
       danger: 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100',
       ghost:
         'border border-transparent bg-transparent text-[#666] hover:bg-[#f4f4f2] hover:text-[#141414]',

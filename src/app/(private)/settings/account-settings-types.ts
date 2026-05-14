@@ -1,6 +1,12 @@
 import type { PaginationMeta, UserSession } from '../../../shared/types/account-types'
 
-export type AccountSectionId = 'profile' | 'social' | 'security' | 'sessions' | 'danger'
+export type AccountSectionId =
+  | 'profile'
+  | 'social'
+  | 'security'
+  | 'sessions'
+  | 'development'
+  | 'danger'
 export type AccountFeedbackTone = 'success' | 'error'
 
 export interface AccountSectionDefinition {

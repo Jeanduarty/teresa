@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   AlertTriangle,
   ChevronDown,
+  Code2,
   Menu,
   Monitor,
   Shield,
@@ -23,6 +24,7 @@ interface AccountSettingsSidebarProps {
   userName: string
   avatarUrl?: string | null
   activeSection: AccountSectionId
+  canAccessDevelopment: boolean
 }
 
 const SECTION_ICONS: Record<AccountSectionId, LucideIcon> = {
@@ -30,6 +32,7 @@ const SECTION_ICONS: Record<AccountSectionId, LucideIcon> = {
   social: Share2,
   security: Shield,
   sessions: Monitor,
+  development: Code2,
   danger: AlertTriangle,
 }
 
@@ -42,6 +45,7 @@ interface SidebarProfileSummaryProps {
 interface SidebarNavigationProps {
   slug: string
   activeSection: AccountSectionId
+  canAccessDevelopment: boolean
   onNavigate?: () => void
 }
 
@@ -69,7 +73,16 @@ function SidebarProfileSummary({ realName, userName, avatarUrl }: SidebarProfile
   )
 }
 
-function SidebarNavigation({ slug, activeSection, onNavigate }: SidebarNavigationProps) {
+function SidebarNavigation({
+  slug,
+  activeSection,
+  canAccessDevelopment,
+  onNavigate,
+}: SidebarNavigationProps) {
+  const sections = ACCOUNT_SECTIONS.filter(
+    (section) => section.id !== 'development' || canAccessDevelopment,
+  )
+
   return (
     <section>
       <p className="font-heading mb-3 px-3 text-[0.8rem] font-medium uppercase tracking-[0.07em] text-[#181818]">
@@ -77,7 +90,7 @@ function SidebarNavigation({ slug, activeSection, onNavigate }: SidebarNavigatio
       </p>
 
       <nav className="flex flex-col gap-1">
-        {ACCOUNT_SECTIONS.map((section) => {
+        {sections.map((section) => {
           const Icon = SECTION_ICONS[section.id]
           const isActive = section.id === activeSection
 
@@ -109,6 +122,7 @@ export function AccountSettingsSidebar({
   userName,
   avatarUrl,
   activeSection,
+  canAccessDevelopment,
 }: AccountSettingsSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const activeSectionLabel =
@@ -147,6 +161,7 @@ export function AccountSettingsSidebar({
               <SidebarNavigation
                 slug={slug}
                 activeSection={activeSection}
+                canAccessDevelopment={canAccessDevelopment}
                 onNavigate={() => setIsMobileMenuOpen(false)}
               />
             </div>
@@ -157,7 +172,11 @@ export function AccountSettingsSidebar({
       <div className="hidden lg:block">
         <SidebarProfileSummary realName={realName} userName={userName} avatarUrl={avatarUrl} />
         <div className="space-y-8">
-          <SidebarNavigation slug={slug} activeSection={activeSection} />
+          <SidebarNavigation
+            slug={slug}
+            activeSection={activeSection}
+            canAccessDevelopment={canAccessDevelopment}
+          />
         </div>
       </div>
     </aside>

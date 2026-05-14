@@ -2,6 +2,8 @@ import { apiBlobRequest, apiRawRequest, apiRequest } from '../shared/lib/api-cli
 import type {
   AuthUser,
   ChangePasswordInput,
+  DevelopmentAccess,
+  DevelopmentSocialJobsResult,
   MutationMessage,
   RequestAccountDeletionInput,
   RequestEmailChangeInput,
@@ -93,5 +95,21 @@ export const settingsService = {
     })
 
     return user
+  },
+
+  async getDevelopmentAccess(): Promise<DevelopmentAccess> {
+    const { development } = await apiRequest<{ development: DevelopmentAccess }>('/settings/development')
+    return development
+  },
+
+  async runDevelopmentSocialJobs(): Promise<DevelopmentSocialJobsResult> {
+    const { result } = await apiRequest<{ result: DevelopmentSocialJobsResult }>(
+      '/settings/development/social-jobs',
+      {
+        method: 'POST',
+      },
+    )
+
+    return result
   },
 }

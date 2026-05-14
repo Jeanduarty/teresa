@@ -63,7 +63,7 @@ export function GroupDialog({
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Editar grupo' : 'Novo grupo'}</DialogTitle>
           <DialogDescription>
-            Use grupos para organizar topicos por projeto, cliente ou linha editorial.
+            Use grupos para organizar tópicos por projeto, cliente ou linha editorial.
           </DialogDescription>
         </DialogHeader>
       <div className="space-y-4">
@@ -82,7 +82,7 @@ export function GroupDialog({
               disabled={isDeleting}
               icon={<Trash2 className="h-4 w-4" />}
               onClick={() => {
-                if (window.confirm('Apagar este grupo? Os topicos continuarao existindo.')) {
+                if (window.confirm('Apagar este grupo? Os tópicos continuarao existindo.')) {
                   void onDelete(state.group.id).then(onClose)
                 }
               }}

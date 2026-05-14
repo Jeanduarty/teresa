@@ -197,7 +197,7 @@ export function FiltersButton({
         <PopoverContent align="center" side="left" className="w-[390px]">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <h3 className="font-heading text-base font-semibold text-[#181818]">Filtrar topicos</h3>
+              <h3 className="font-heading text-base font-semibold text-[#181818]">Filtrar tópicos</h3>
               <p className="mt-1 text-xs leading-5 text-[#666]">Refine a lista sem sair da pagina.</p>
             </div>
             <PopoverClose asChild>
@@ -230,7 +230,7 @@ export function FiltersButton({
       </DialogTrigger>
       <DialogContent className="h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-none overflow-y-auto rounded-[24px]">
         <DialogHeader>
-          <DialogTitle>Filtrar topicos</DialogTitle>
+          <DialogTitle>Filtrar tópicos</DialogTitle>
           <DialogDescription>Refine a lista sem sair da pagina.</DialogDescription>
         </DialogHeader>
         {content}

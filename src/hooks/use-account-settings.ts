@@ -7,12 +7,15 @@ import { clearUser } from '../store/slices/auth-session-slice'
 import { useAppDispatch } from '../store/hooks'
 import type {
   AuthUser,
+  DevelopmentAccess,
+  DevelopmentSocialJobsResult,
   MutationMessage,
   PublicProfile,
   UserSessionPage,
 } from '../shared/types/account-types'
 import { useProfile } from './use-profile'
 import { settingsService } from '../services/settings-service'
+import { clearUserAvatarCache } from './use-user-avatar'
 
 interface UseAccountSettingsParams {
   slug: string
@@ -56,6 +59,19 @@ export function useAccountSettings({
     },
     enabled: Boolean(userId) && section === 'sessions',
     placeholderData: keepPreviousData,
+  })
+
+  const developmentAccessQuery = useQuery<DevelopmentAccess, Error>({
+    queryKey: ['settings', 'development', userId],
+    queryFn: () => {
+      if (!userId) {
+        throw new Error('ID do usuário é obrigatório')
+      }
+
+      return settingsService.getDevelopmentAccess()
+    },
+    enabled: Boolean(userId),
+    staleTime: 30_000,
   })
 
   const updateProfileMutation = useMutation<
@@ -130,6 +146,7 @@ export function useAccountSettings({
       queryClient.setQueryData<AuthUser | null>(['session'], updatedUser)
       syncProfileCache(slug, updatedUser)
       syncProfileCache(updatedUser.userName, updatedUser)
+      clearUserAvatarCache(updatedUser.id)
       void queryClient.invalidateQueries({ queryKey: ['user-avatar', updatedUser.id] })
     },
   })
@@ -140,18 +157,37 @@ export function useAccountSettings({
       queryClient.setQueryData<AuthUser | null>(['session'], updatedUser)
       syncProfileCache(slug, updatedUser)
       syncProfileCache(updatedUser.userName, updatedUser)
+      clearUserAvatarCache(updatedUser.id)
       void queryClient.invalidateQueries({ queryKey: ['user-avatar', updatedUser.id] })
+    },
+  })
+
+  const runDevelopmentSocialJobsMutation = useMutation<DevelopmentSocialJobsResult, Error, void>({
+    mutationFn: settingsService.runDevelopmentSocialJobs,
+    onSuccess: (result) => {
+      queryClient.setQueryData<DevelopmentAccess | undefined>(
+        ['settings', 'development', userId],
+        (currentAccess) =>
+          currentAccess
+            ? {
+                ...currentAccess,
+                cooldownEndsAt: result.cooldownEndsAt,
+              }
+            : currentAccess,
+      )
     },
   })
 
   return {
     profileQuery,
     sessionsQuery,
+    developmentAccessQuery,
     updateProfileMutation,
     requestEmailChangeMutation,
     changePasswordMutation,
     requestAccountDeletionMutation,
     uploadProfileAvatarMutation,
     removeProfileAvatarMutation,
+    runDevelopmentSocialJobsMutation,
   }
 }

@@ -49,7 +49,7 @@ export function GroupsGrid({
           <Folder className="mx-auto h-8 w-8 text-[#777]" />
           <h3 className="mt-4 font-heading text-xl font-semibold text-[#181818]">Nenhum grupo ainda</h3>
           <p className="mx-auto mt-2 max-w-[420px] text-sm leading-6 text-[#666]">
-            Crie o primeiro grupo para separar topicos por tema ou projeto.
+            Crie o primeiro grupo para separar tópicos por tema ou projeto.
           </p>
           <Button className="mt-5 rounded-full" icon={<Plus className="h-4 w-4" />} onClick={onCreate}>
             Criar grupo

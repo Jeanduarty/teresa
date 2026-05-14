@@ -5,7 +5,7 @@ import type { ContentTopicMetrics } from '../../../shared/types/account-types'
 
 export function MetricsPanel({ metrics }: { metrics?: ContentTopicMetrics }) {
   const items = [
-    { label: 'Topicos gerados', value: metrics?.total ?? 0 },
+    { label: 'Tópicos gerados', value: metrics?.total ?? 0 },
     { label: 'Feitos', value: metrics?.completed ?? 0 },
     { label: 'Pendentes', value: metrics?.pending ?? 0 },
     { label: 'Sinais do Twitter/X', value: metrics?.twitterSignals ?? 0 },
@@ -17,7 +17,7 @@ export function MetricsPanel({ metrics }: { metrics?: ContentTopicMetrics }) {
     <PopoverContent align="end" className="w-[min(340px,calc(100vw-48px))]">
       <div className="mb-3 flex items-center gap-2 text-[#181818]">
         <BarChart3 className="h-4 w-4" />
-        <h2 className="font-heading text-base font-semibold">Metricas dos topicos</h2>
+        <h2 className="font-heading text-base font-semibold">Metricas dos tópicos</h2>
       </div>
       <dl className="grid gap-2">
         {items.map((item) => (

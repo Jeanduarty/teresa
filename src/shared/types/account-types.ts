@@ -102,6 +102,21 @@ export interface MutationMessage {
   message: string
 }
 
+export interface DevelopmentAccess {
+  canAccessDevelopment: boolean
+  hasConnectedSocialAccount: boolean
+  cooldownEndsAt: string | null
+}
+
+export interface DevelopmentSocialJobsResult {
+  cooldownEndsAt: string
+  skipped: boolean
+  scheduledHour: number
+  enqueuedJobs: number
+  processedJobs: number
+  generatedTopics: number
+}
+
 export interface RevokeSessionResult {
   sessionId: string
   shouldLogout: boolean
@@ -195,6 +210,10 @@ export interface LinkPreview {
   resolvedUrl: string
   contentType: string | null
   kind: LinkPreviewKind
+  title: string | null
+  description: string | null
+  imageUrl: string | null
+  siteName: string | null
 }
 
 export interface SocialActivityPost {

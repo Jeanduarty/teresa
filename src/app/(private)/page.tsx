@@ -211,11 +211,11 @@ export function HomePage() {
             </Button>
           ) : null}
           <h2 className="font-heading text-2xl font-semibold text-[#141414]">
-            {groupContextId ? (selectedGroup?.name ?? 'Grupo') : 'Topicos'}
+            {groupContextId ? (selectedGroup?.name ?? 'Grupo') : 'Tópicos'}
           </h2>
           <p className="mt-1 text-sm leading-6 text-[#666]">
             {groupContextId
-              ? 'Topicos vinculados a este grupo.'
+              ? 'Tópicos vinculados a este grupo.'
               : 'Use os filtros para encontrar ideias por status, titulo ou tags.'}
           </p>
         </div>
@@ -272,7 +272,7 @@ export function HomePage() {
               </Link>
             </div>
             <p className="mt-4 max-w-[720px] text-base leading-7 text-[#666]">
-              Topicos gerados automaticamente a partir das curtidas das redes sociais.
+              Tópicos gerados automaticamente a partir das curtidas das redes sociais.
             </p>
           </div>
         </div>
@@ -281,7 +281,7 @@ export function HomePage() {
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="mb-8 flex justify-center">
           <TabsList aria-label="Visualizacao da home">
-            <TabsTrigger value="topics" aria-label="Topicos">
+            <TabsTrigger value="topics" aria-label="Tópicos">
               <Grid3X3 className="h-5 w-5" />
             </TabsTrigger>
             <TabsTrigger value="groups" aria-label="Grupos">
@@ -298,7 +298,7 @@ export function HomePage() {
                   Vincule uma rede social
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-[#666]">
-                  Conecte Twitter/X ou TikTok para começar a gerar topicos automaticamente.
+                  Conecte Twitter/X ou TikTok para começar a gerar tópicos automaticamente.
                 </p>
               </div>
 

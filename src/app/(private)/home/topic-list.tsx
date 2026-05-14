@@ -65,7 +65,7 @@ export function TopicList({
           Nenhum topico encontrado
         </h3>
         <p className="mx-auto mt-2 max-w-[460px] text-sm leading-6 text-[#666]">
-          Ajuste os filtros ou vincule suas redes sociais para gerar novos topicos.
+          Ajuste os filtros ou vincule suas redes sociais para gerar novos tópicos.
         </p>
       </div>
     )
@@ -90,7 +90,7 @@ export function TopicList({
 
       {list.hasMore ? (
         <p className="mt-6 text-center text-sm font-medium text-[#666]">
-          Role para carregar mais topicos.
+          Role para carregar mais tópicos.
         </p>
       ) : null}
     </>

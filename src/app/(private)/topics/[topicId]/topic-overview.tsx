@@ -30,7 +30,7 @@ function EditableHeader({
       <button
         type="button"
         onClick={() => onEdit({ field: 'title', value: topic.title })}
-        className="group inline-flex max-w-full items-center gap-2 text-left"
+        className="group inline-flex max-w-full gap-2 text-left"
       >
         <h1 className="font-heading text-3xl font-bold leading-tight text-[#141414]">
           {topic.title}
@@ -115,6 +115,7 @@ export function TopicOverview({
 
       <div className="flex shrink-0 flex-wrap gap-2">
         <Button
+          variant={isCompleted ? 'outline' : 'primary'}
           disabled={isDeleted || isMarkingDone || isMarkingPending}
           onClick={isCompleted ? onMarkPending : onMarkDone}
           className="rounded-full"

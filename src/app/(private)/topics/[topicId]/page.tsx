@@ -77,7 +77,7 @@ export function TopicDetailsPage() {
         className="mb-8 inline-flex items-center gap-2 text-[0.96rem] font-medium text-[#666] transition-colors hover:text-[#141414]"
       >
         <ArrowLeft className="h-4 w-4" />
-        Voltar para topicos
+        Voltar para tópicos
       </Link>
 
       {topicQuery.isLoading ? <TopicDetailsLoadingState /> : null}

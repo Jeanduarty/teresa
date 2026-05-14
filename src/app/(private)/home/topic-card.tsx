@@ -122,7 +122,7 @@ export function TopicCard({
         <p className="truncate text-xs font-medium text-[#777]">{formatDate(topic.generatedAt)}</p>
         <Button
           size="xs"
-          variant="secondary"
+          variant={isCompleted ? 'outline' : 'secondary'}
           disabled={isDeleted || actionState.isMarkingDone || actionState.isMarkingPending}
           className="self-start rounded-full sm:self-auto"
           icon={<Check className="h-3.5 w-3.5" />}

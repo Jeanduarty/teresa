@@ -13,6 +13,7 @@ export const ACCOUNT_SECTIONS: AccountSectionDefinition[] = [
   { id: 'social', label: 'Redes sociais' },
   { id: 'security', label: 'Segurança' },
   { id: 'sessions', label: 'Sessões' },
+  { id: 'development', label: 'Desenvolvimento' },
   { id: 'danger', label: 'Zona de perigo' },
 ]
 

@@ -8,6 +8,7 @@ import { useUserAvatar } from '../../../hooks/use-user-avatar'
 import type { PublicProfile } from '../../../shared/types/account-types'
 import { useAccountSettings } from '../../../hooks/use-account-settings'
 import { AccountSettingsDangerSection } from './account-settings-danger-section'
+import { AccountSettingsDevelopmentSection } from './account-settings-development-section'
 import { AccountSettingsProfileSection } from './account-settings-profile-section'
 import { AccountSettingsSecuritySection } from './account-settings-security-section'
 import { AccountSettingsSocialSection } from './account-settings-social-section'
@@ -168,6 +169,17 @@ export function AccountSettingsPage() {
 
   if (settings.profileQuery.isLoading || !profile) {
     return <SettingsSkeleton />
+  }
+
+  const developmentAccess = settings.developmentAccessQuery.data
+  const canAccessDevelopment = Boolean(developmentAccess?.canAccessDevelopment)
+
+  if (
+    activeSection === 'development' &&
+    !settings.developmentAccessQuery.isLoading &&
+    !canAccessDevelopment
+  ) {
+    return <Navigate to="/settings/profile" replace />
   }
 
   const currentProfile = profile
@@ -384,6 +396,7 @@ export function AccountSettingsPage() {
               userName={currentProfile.userName}
               avatarUrl={avatarQuery.avatarUrl}
               activeSection={activeSection}
+              canAccessDevelopment={canAccessDevelopment}
             />
         </aside>
 
@@ -458,6 +471,20 @@ export function AccountSettingsPage() {
               }}
               onNextPage={() => {
                 setSessionsPage((current) => current + 1)
+              }}
+            />
+          ) : null}
+
+          {activeSection === 'development' && canAccessDevelopment ? (
+            <AccountSettingsDevelopmentSection
+              hasConnectedSocialAccount={Boolean(developmentAccess?.hasConnectedSocialAccount)}
+              cooldownEndsAt={developmentAccess?.cooldownEndsAt ?? null}
+              isPending={settings.runDevelopmentSocialJobsMutation.isPending}
+              result={settings.runDevelopmentSocialJobsMutation.data}
+              errorMessage={settings.runDevelopmentSocialJobsMutation.error?.message}
+              onRunSocialJobs={() => {
+                settings.runDevelopmentSocialJobsMutation.reset()
+                void settings.runDevelopmentSocialJobsMutation.mutateAsync()
               }}
             />
           ) : null}
