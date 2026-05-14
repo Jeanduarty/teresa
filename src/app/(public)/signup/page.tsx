@@ -13,6 +13,7 @@ import {
   validateUserName,
 } from '../../../shared/lib/validation'
 import type { SignupInput } from '../../../shared/types/account-types'
+import { Button } from '../../../components/ui'
 
 export function SignupPage() {
   const navigate = useNavigate()
@@ -43,6 +44,14 @@ export function SignupPage() {
   const errorMessage = isSecretVerified
     ? signupMutation.error?.message
     : verifySecretMutation.error?.message
+  const signupErrorMessage = signupMutation.error?.message ?? ''
+  const emailServerError = signupErrorMessage.toLowerCase().includes('e-mail')
+    ? signupErrorMessage
+    : ''
+  const userNameServerError = signupErrorMessage.toLowerCase().includes('usuário')
+    ? signupErrorMessage
+    : ''
+  const visibleErrorMessage = emailServerError || userNameServerError ? '' : errorMessage
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -100,10 +109,10 @@ export function SignupPage() {
       footerHref="/login"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {errorMessage ? (
+        {visibleErrorMessage ? (
           <div className="rounded-[24px] border border-red-200 bg-red-50 px-6 py-4">
             <p className="font-body text-sm font-medium leading-6 text-red-600">
-              {errorMessage}
+              {visibleErrorMessage}
             </p>
           </div>
         ) : null}
@@ -128,10 +137,13 @@ export function SignupPage() {
               label="E-mail"
               type="email"
               value={form.email}
-              onChange={(email) => setForm((current) => ({ ...current, email }))}
+              onChange={(email) => {
+                signupMutation.reset()
+                setForm((current) => ({ ...current, email }))
+              }}
               placeholder="seu.email@exemplo.com"
               autoComplete="email"
-              error={errors.email}
+              error={errors.email || emailServerError}
             />
 
             <FormField
@@ -139,6 +151,7 @@ export function SignupPage() {
               label="Nome de usuário"
               value={form.userName}
               onChange={(userName) => {
+                signupMutation.reset()
                 setForm((current) => ({
                   ...current,
                   userName: sanitizeUserName(userName),
@@ -146,7 +159,7 @@ export function SignupPage() {
               }}
               placeholder="joaosilva"
               autoComplete="username"
-              error={errors.userName}
+              error={errors.userName || userNameServerError}
             />
 
             <FormField
@@ -154,7 +167,10 @@ export function SignupPage() {
               label="Senha"
               type="password"
               value={form.password}
-              onChange={(password) => setForm((current) => ({ ...current, password }))}
+              onChange={(password) => {
+                signupMutation.reset()
+                setForm((current) => ({ ...current, password }))
+              }}
               placeholder="Crie uma senha forte"
               autoComplete="new-password"
               error={errors.password}
@@ -163,21 +179,21 @@ export function SignupPage() {
         )}
 
         <div className="mt-2 flex flex-col items-center gap-4">
-          <button
+          <Button
             type="submit"
             disabled={isPending || (isSecretVerified && hasSignupErrors)}
-            className="app-btn-primary shadow-elevation-1 flex h-14 w-full items-center justify-center rounded-full px-6 disabled:cursor-not-allowed disabled:opacity-50"
+            size="lg"
+            fullWidth
+            className="shadow-elevation-1"
           >
-            <span className="font-body text-base font-semibold leading-6 text-[#f4f4f4]">
-              {!isSecretVerified
-                ? verifySecretMutation.isPending
-                  ? 'Verificando...'
-                  : 'Continuar'
-                : signupMutation.isPending
-                  ? 'Criando conta...'
-                  : 'Criar conta'}
-            </span>
-          </button>
+            {!isSecretVerified
+              ? verifySecretMutation.isPending
+                ? 'Verificando...'
+                : 'Continuar'
+              : signupMutation.isPending
+                ? 'Criando conta...'
+                : 'Criar conta'}
+          </Button>
         </div>
       </form>
     </AuthLayout>

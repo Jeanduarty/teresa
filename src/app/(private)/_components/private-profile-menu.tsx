@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, LogOut, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { Button } from '../../../components/ui'
+
 interface PrivateProfileMenuProps {
   realName: string
   userName: string
@@ -43,18 +45,18 @@ export function PrivateProfileMenu({
 
   return (
     <div ref={menuRef} className="relative">
-      <button
-        type="button"
+      <Button
         aria-expanded={isOpen}
         aria-haspopup="menu"
         onClick={() => setIsOpen((current) => !current)}
-        className="font-heading inline-flex h-[50px] items-center gap-2 rounded-full border border-black/10 bg-white px-5 text-[0.96rem] font-semibold text-[#181818] shadow-[0_10px_24px_-24px_rgba(0,0,0,0.28)] transition-colors hover:bg-[#fbfbfb]"
+        variant="secondary"
+        className="font-heading h-[50px] rounded-full px-5 text-[0.96rem] text-[#181818] shadow-[0_10px_24px_-24px_rgba(0,0,0,0.28)] hover:bg-[#fbfbfb]"
       >
         <span>Olá, {displayName}</span>
         <ChevronDown
           className={`h-4 w-4 text-[#666] transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
-      </button>
+      </Button>
 
       {isOpen ? (
         <div
@@ -79,18 +81,18 @@ export function PrivateProfileMenu({
               <span>Configurações</span>
             </Link>
 
-            <button
-              type="button"
+            <Button
               role="menuitem"
               onClick={() => {
                 setIsOpen(false)
                 void onLogout()
               }}
-              className="font-heading flex w-full items-center gap-3 border-t border-black/10 px-4 py-3.5 text-left text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+              variant="ghost"
+              className="font-heading h-auto w-full justify-start rounded-none border-t border-black/10 px-4 py-3.5 text-left text-[0.98rem] font-medium text-[#181818] hover:bg-[#fafafa]"
             >
               <LogOut className="h-4 w-4" />
               <span>Sair</span>
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}

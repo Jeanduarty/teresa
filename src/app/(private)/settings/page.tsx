@@ -358,6 +358,7 @@ export function AccountSettingsPage() {
       setDeleteSuccessMessage(result.message)
       setDeletePassword('')
       setDeleteSubmitted(false)
+      navigate('/login', { replace: true })
     } catch {
       // Mutation error is rendered below the form.
     }

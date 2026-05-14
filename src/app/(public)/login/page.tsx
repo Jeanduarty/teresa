@@ -7,6 +7,7 @@ import { FormField } from '../_components/form-field'
 import { useLogin } from '../../../hooks/use-auth'
 import { validateRequiredPassword } from '../../../shared/lib/validation'
 import type { LoginInput } from '../../../shared/types/account-types'
+import { Button } from '../../../components/ui'
 
 function validateIdentifier(identifier: string): string {
   if (!identifier.trim()) {
@@ -104,15 +105,15 @@ export function LoginPage() {
         </div>
 
         <div className="mt-2 flex flex-col items-center gap-4">
-          <button
+          <Button
             type="submit"
             disabled={loginMutation.isPending || hasErrors}
-            className="app-btn-primary shadow-elevation-1 flex h-14 w-full items-center justify-center rounded-full px-6 disabled:cursor-not-allowed disabled:opacity-50"
+            size="lg"
+            fullWidth
+            className="shadow-elevation-1"
           >
-            <span className="font-body text-base font-semibold leading-6 text-[#f4f4f4]">
-              {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
-            </span>
-          </button>
+            {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
+          </Button>
         </div>
       </form>
     </AuthLayout>

@@ -1,3 +1,4 @@
+import { Button } from '../../../components/ui'
 import { AccountSettingsFeedback } from './account-settings-feedback'
 import { AccountSettingsField } from './account-settings-field'
 import type {
@@ -60,13 +61,14 @@ export function AccountSettingsProfileSection({
         <AccountSettingsFeedback tone="error" message={errorMessage} />
         <AccountSettingsFeedback tone="success" message={successMessage} />
 
-        <button
+        <Button
           type="submit"
           disabled={!canSubmit || isPending}
-          className="inline-flex h-12 items-center justify-center rounded-[14px] bg-[#a4a4a4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#909090] disabled:cursor-not-allowed disabled:opacity-60"
+          variant="secondary"
+          className="h-12 bg-[#a4a4a4] text-white hover:bg-[#909090]"
         >
           {isPending ? 'Salvando...' : 'Salvar alterações'}
-        </button>
+        </Button>
       </form>
     </div>
   )

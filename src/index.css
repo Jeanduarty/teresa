@@ -75,7 +75,7 @@ summary::-webkit-details-marker {
 
 button,
 input {
-  font: inherit;
+  font-family: inherit;
 }
 
 a {

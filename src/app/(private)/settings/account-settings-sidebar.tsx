@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { Button } from '../../../components/ui'
 import { ACCOUNT_SECTIONS, getAccountSectionHref } from './account-settings-utils'
 import type { AccountSectionId } from './account-settings-types'
 
@@ -109,12 +110,12 @@ export function AccountSettingsSidebar({
   return (
     <aside className="w-full lg:w-[206px] lg:shrink-0">
       <div className="lg:hidden">
-        <button
-          type="button"
+        <Button
           aria-expanded={isMobileMenuOpen}
           aria-controls="account-settings-mobile-menu"
           onClick={() => setIsMobileMenuOpen((current) => !current)}
-          className="font-heading flex w-full items-center justify-between rounded-[18px] border border-black/10 bg-white px-4 py-3.5 text-left shadow-[0_10px_24px_-24px_rgba(0,0,0,0.28)]"
+          variant="secondary"
+          className="font-heading h-auto w-full justify-between rounded-[18px] px-4 py-3.5 text-left shadow-[0_10px_24px_-24px_rgba(0,0,0,0.28)]"
         >
           <span className="flex items-center gap-3 text-[#181818]">
             {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -127,7 +128,7 @@ export function AccountSettingsSidebar({
               className={`h-4 w-4 transition-transform ${isMobileMenuOpen ? 'rotate-180' : ''}`}
             />
           </span>
-        </button>
+        </Button>
 
         {isMobileMenuOpen ? (
           <div

@@ -10,6 +10,7 @@ export interface AuthUser {
   email: string
   realName: string
   userName: string
+  status: 'active' | 'inactive' | 'deleted'
   isVerified: boolean
   createdAt: string
   pendingEmail: string | null
@@ -105,6 +106,8 @@ export interface RevokeSessionResult {
 }
 
 export type SocialProvider = 'twitter' | 'tiktok'
+export type ContentTopicStatus = 'pending' | 'completed' | 'deleted'
+export type ContentTopicStatusFilter = 'pending' | 'completed' | 'all'
 
 export interface SocialAccount {
   id: string
@@ -116,22 +119,52 @@ export interface SocialAccount {
   permissions: string[]
 }
 
-export interface ContentReport {
+export interface ContentTopic {
   id: string
   userId: string
+  groups: ContentTopicGroupSummary[]
   title: string
   summary: string
   originalScript: string
   currentScript: string
   editedAt: string | null
   sourceProvider: SocialProvider
+  status: ContentTopicStatus
   signals: string[]
-  savedPosts: SavedSocialPost[]
+  tags: string[]
+  topicReferences: TopicReference[]
   generatedAt: string
   completedAt: string | null
 }
 
-export interface SavedSocialPost {
+export interface ContentTopicGroupSummary {
+  id: string
+  userId: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ContentTopicGroup extends ContentTopicGroupSummary {
+  topicsCount: number
+}
+
+export interface ContentTopicFilters {
+  title?: string
+  status?: ContentTopicStatusFilter
+  tags?: string[]
+  groupId?: string | null
+}
+
+export interface UpdateContentTopicInput {
+  userId: string
+  topicId: string
+  title?: string
+  summary?: string
+  tags?: string[]
+}
+
+export interface TopicReference {
   id: string
   provider: SocialProvider
   title: string
@@ -144,7 +177,7 @@ export interface SavedSocialPost {
   engagementReason: string
 }
 
-export interface ContentReportMetrics {
+export interface ContentTopicMetrics {
   total: number
   completed: number
   pending: number

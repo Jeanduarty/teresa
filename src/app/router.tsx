@@ -5,7 +5,7 @@ import { useAuthSession } from '../hooks/use-auth'
 import { PrivateLayout } from './(private)/_components/private-layout'
 import { AccountSettingsPage } from './(private)/settings/page'
 import { HomePage } from './(private)/page'
-import { ReportDetailsPage } from './(private)/reports/[reportId]/page'
+import { TopicDetailsPage } from './(private)/topics/[topicId]/page'
 import { LoginPage } from './(public)/login/page'
 import { SignupPage } from './(public)/signup/page'
 
@@ -57,9 +57,11 @@ export function AppRouter() {
           }
         >
           <Route path="/" element={<HomePage />} />
+          <Route path="/groups" element={<HomePage />} />
+          <Route path="/groups/:groupId" element={<HomePage />} />
           <Route path="/settings" element={<AccountSettingsPage />} />
           <Route path="/settings/:section" element={<AccountSettingsPage />} />
-          <Route path="/reports/:reportId" element={<ReportDetailsPage />} />
+          <Route path="/topics/:topicId" element={<TopicDetailsPage />} />
         </Route>
         <Route
           path="/login"

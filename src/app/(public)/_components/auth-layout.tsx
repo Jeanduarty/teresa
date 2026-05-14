@@ -25,7 +25,10 @@ export function AuthLayout({
       <div className="app-panel w-full max-w-[480px] overflow-hidden rounded-[16px]">
         <div className="border-b border-black/10 px-8 py-8 sm:px-10">
           <div className="mb-8 flex justify-center sm:justify-start">
-            <Logo />
+            <Logo
+              imageClassName="h-12 w-12"
+              textClassName="text-[1.55rem] tracking-[0.2em]"
+            />
           </div>
           <div className="mb-6 flex flex-col gap-2">
             <h1 className="font-heading text-2xl font-semibold leading-6 text-[#141414]">{title}</h1>

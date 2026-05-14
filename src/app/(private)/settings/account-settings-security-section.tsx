@@ -1,3 +1,4 @@
+import { Button } from '../../../components/ui'
 import { AccountSettingsFeedback } from './account-settings-feedback'
 import { AccountSettingsField } from './account-settings-field'
 import type {
@@ -88,13 +89,14 @@ export function AccountSettingsSecuritySection({
             <AccountSettingsFeedback tone="error" message={emailErrorMessage} />
             <AccountSettingsFeedback tone="success" message={emailSuccessMessage} />
 
-            <button
+            <Button
               type="submit"
               disabled={!canSubmitEmail || isSendingEmail}
-              className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[#a4a4a4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#909090] disabled:cursor-not-allowed disabled:opacity-60"
+              variant="secondary"
+              className="bg-[#a4a4a4] text-white hover:bg-[#909090]"
             >
               {isSendingEmail ? 'Enviando...' : 'Enviar verificação'}
-            </button>
+            </Button>
           </form>
         </section>
 
@@ -142,13 +144,14 @@ export function AccountSettingsSecuritySection({
             <AccountSettingsFeedback tone="error" message={passwordErrorMessage} />
             <AccountSettingsFeedback tone="success" message={passwordSuccessMessage} />
 
-            <button
+            <Button
               type="submit"
               disabled={!canSubmitPassword || isChangingPassword}
-              className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[#a4a4a4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#909090] disabled:cursor-not-allowed disabled:opacity-60"
+              variant="secondary"
+              className="bg-[#a4a4a4] text-white hover:bg-[#909090]"
             >
               {isChangingPassword ? 'Alterando...' : 'Alterar senha'}
-            </button>
+            </Button>
           </form>
         </section>
       </div>

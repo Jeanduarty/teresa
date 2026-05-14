@@ -9,6 +9,7 @@ import type {
   SocialDailyLikedPostsResult,
   SocialProvider,
 } from '../../../shared/types/account-types'
+import { Button, Card } from '../../../components/ui'
 import { AccountSettingsFeedback } from './account-settings-feedback'
 
 interface AccountSettingsSocialSectionProps {
@@ -115,7 +116,7 @@ function SocialAccountCard({
   const statusLabel = account.isConnected ? 'Conectado' : 'Pendente'
 
   return (
-    <article className="overflow-hidden rounded-[22px] border border-black/10 bg-white shadow-[0_16px_42px_-34px_rgba(0,0,0,0.45)]">
+    <Card as="article" className="overflow-hidden rounded-[22px] shadow-[0_16px_42px_-34px_rgba(0,0,0,0.45)]">
       <div className={`h-1.5 ${provider.accentClassName}`} />
 
       <div className="p-5">
@@ -158,40 +159,44 @@ function SocialAccountCard({
 
           {account.isConnected ? (
             <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
-              <button
+              <Button
                 type="button"
                 disabled={isPending}
                 onClick={() => onFetchDailyLikedPosts(account.provider)}
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] border border-black/15 bg-white px-3.5 !text-xs font-semibold text-[#181818] transition-colors hover:bg-[#f4f4f2] disabled:cursor-not-allowed disabled:opacity-60"
+                variant="secondary"
+                size="sm"
+                icon={<Search className="h-3.5 w-3.5" />}
               >
-                <Search className="h-3.5 w-3.5" />
                 {isFetchingDailyLikedPosts ? 'Buscando...' : 'Testar sinais'}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
                 disabled={isPending}
                 onClick={() => onDisconnect(account.provider)}
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] border border-red-200 bg-red-50 px-3.5 !text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                variant="danger"
+                size="sm"
+                icon={<Unplug className="h-3.5 w-3.5" />}
               >
-                <Unplug className="h-3.5 w-3.5" />
                 {isDisconnecting ? 'Removendo...' : 'Desvincular'}
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
               type="button"
               disabled={isPending}
               onClick={() => onConnect(account.provider)}
-              className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-[12px] border border-black/15 bg-white px-3.5 !text-xs font-semibold text-[#181818] transition-colors hover:bg-[#f4f4f2] disabled:cursor-not-allowed disabled:opacity-60"
+              variant="secondary"
+              size="sm"
+              className="shrink-0"
+              icon={<Link2 className="h-3.5 w-3.5" />}
             >
-              <Link2 className="h-3.5 w-3.5" />
               {isConnecting ? 'Conectando...' : 'Vincular'}
-            </button>
+            </Button>
           )}
         </div>
       </div>
-    </article>
+    </Card>
   )
 }
 
@@ -203,7 +208,7 @@ function SocialLikedPostsPreview({ result }: { result?: SocialDailyLikedPostsRes
   const provider = PROVIDER_LABELS[result.provider]
 
   return (
-    <section className="rounded-[20px] border border-black/10 bg-[#fbfbfa] p-5">
+    <Card as="section" variant="muted" className="rounded-[20px] p-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="font-heading text-lg font-semibold text-[#181818]">
@@ -244,7 +249,7 @@ function SocialLikedPostsPreview({ result }: { result?: SocialDailyLikedPostsRes
           ))}
         </div>
       ) : null}
-    </section>
+    </Card>
   )
 }
 

@@ -2,6 +2,9 @@ import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 
 import type { AccountSectionId } from '../app/(private)/settings/account-settings-types'
 import { queryClient } from '../shared/lib/query-client'
+import { clearAuthToken } from '../shared/lib/auth-token-storage'
+import { clearUser } from '../store/slices/auth-session-slice'
+import { useAppDispatch } from '../store/hooks'
 import type {
   AuthUser,
   MutationMessage,
@@ -34,6 +37,7 @@ export function useAccountSettings({
   sessionsPage = 1,
   sessionsPerPage = 10,
 }: UseAccountSettingsParams) {
+  const dispatch = useAppDispatch()
   const profileQuery = useProfile(slug)
   const normalizedSessionsPage = Math.max(1, sessionsPage)
   const normalizedSessionsPerPage = Math.min(Math.max(1, sessionsPerPage), 20)
@@ -112,6 +116,11 @@ export function useAccountSettings({
       }
 
       return settingsService.requestAccountDeletion({ userId, ...input })
+    },
+    onSuccess: () => {
+      clearAuthToken()
+      dispatch(clearUser())
+      queryClient.setQueryData<AuthUser | null>(['session'], null)
     },
   })
 

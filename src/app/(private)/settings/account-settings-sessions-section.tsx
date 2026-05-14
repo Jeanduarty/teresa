@@ -1,6 +1,7 @@
 import type { SessionClientType } from '../../../shared/types/account-types'
 import { Apple, Globe, Monitor, Terminal } from 'lucide-react'
 
+import { Button } from '../../../components/ui'
 import {
   formatSessionCreatedDate,
   formatSessionLastActive,
@@ -82,13 +83,14 @@ export function AccountSettingsSessionsSection({
         <div className="rounded-[18px] border border-red-200 bg-red-50 px-5 py-5 text-sm">
           <p className="font-semibold text-red-700">Falha ao carregar sessões.</p>
           <p className="mt-1 text-red-600">{loadErrorMessage}</p>
-          <button
-            type="button"
+          <Button
             onClick={onRetry}
-            className="mt-4 text-sm font-semibold text-red-700 hover:underline"
+            variant="ghost"
+            size="sm"
+            className="mt-4 px-0 text-red-700 hover:bg-transparent hover:underline"
           >
             Tentar novamente
-          </button>
+          </Button>
         </div>
       ) : null}
 
@@ -194,27 +196,27 @@ export function AccountSettingsSessionsSection({
 
           {pagination ? (
             <div className="flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                type="button"
+              <Button
                 onClick={onPreviousPage}
                 disabled={!pagination.hasPreviousPage || isFetching}
-                className="app-btn-secondary inline-flex h-10 items-center justify-center rounded-full px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                variant="secondary"
+                className="h-10 rounded-full px-4"
               >
                 Sessões mais recentes
-              </button>
+              </Button>
 
               <span className="text-center text-sm font-medium text-[#666]">
                 {pagination.perPage} por página
               </span>
 
-              <button
-                type="button"
+              <Button
                 onClick={onNextPage}
                 disabled={!pagination.hasNextPage || isFetching}
-                className="app-btn-secondary inline-flex h-10 items-center justify-center rounded-full px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                variant="secondary"
+                className="h-10 rounded-full px-4"
               >
                 Sessões antigas
-              </button>
+              </Button>
             </div>
           ) : null}
         </>

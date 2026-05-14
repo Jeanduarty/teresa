@@ -19,7 +19,10 @@ export function PrivateLayout() {
       <header className="sticky top-0 z-30 flex h-[80px] w-full items-center justify-center border-b border-black/10 bg-white/95 backdrop-blur-sm">
         <div className="flex h-full w-full max-w-[1128px] items-center justify-between gap-4 px-6 md:px-0">
           <Link to="/" aria-label="Ir para o início">
-            <Logo />
+            <Logo
+              imageClassName="h-9 w-9"
+              textClassName="text-[1.05rem] tracking-[0.16em]"
+            />
           </Link>
 
           {user ? (
