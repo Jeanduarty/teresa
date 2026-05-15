@@ -2,12 +2,12 @@ import type { FormEvent } from 'react'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { AuthLayout } from '../_components/auth-layout'
-import { FormField } from '../_components/form-field'
+import { Button } from '../../../components/ui'
 import { useLogin } from '../../../hooks/use-auth'
 import { validateRequiredPassword } from '../../../shared/lib/validation'
 import type { LoginInput } from '../../../shared/types/account-types'
-import { Button } from '../../../components/ui'
+import { AuthLayout } from '../_components/auth-layout'
+import { FormField } from '../_components/form-field'
 
 function validateIdentifier(identifier: string): string {
   if (!identifier.trim()) {
