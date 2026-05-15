@@ -113,7 +113,6 @@ export interface DevelopmentSocialJobsResult {
   startedAt: string
   cooldownEndsAt: string
   skipped: boolean
-  scheduledHour: number
   jobIds: string[]
   enqueuedJobs: number
   processedJobs: number
