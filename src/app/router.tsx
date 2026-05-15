@@ -8,6 +8,8 @@ import { HomePage } from './(private)/page'
 import { TopicDetailsPage } from './(private)/topics/[topicId]/page'
 import { LoginPage } from './(public)/login/page'
 import { SignupPage } from './(public)/signup/page'
+import { LegalPage } from './public/legal/page'
+import { PublicLandingPage } from './public/page'
 
 function SessionSync() {
   useAuthSession()
@@ -79,6 +81,9 @@ export function AppRouter() {
             </AuthOnly>
           }
         />
+        <Route path="/public" element={<PublicLandingPage />} />
+        <Route path="/app-preview" element={<Navigate to="/public" replace />} />
+        <Route path="/legal/:page" element={<LegalPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
