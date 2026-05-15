@@ -4,6 +4,7 @@ import type {
   ChangePasswordInput,
   DevelopmentAccess,
   DevelopmentSocialJobsResult,
+  DevelopmentSocialJobsStatus,
   MutationMessage,
   RequestAccountDeletionInput,
   RequestEmailChangeInput,
@@ -111,5 +112,16 @@ export const settingsService = {
     )
 
     return result
+  },
+
+  async getDevelopmentSocialJobsStatus(runId: string): Promise<DevelopmentSocialJobsStatus> {
+    const params = new URLSearchParams({
+      runId,
+    })
+    const { status } = await apiRequest<{ status: DevelopmentSocialJobsStatus }>(
+      `/settings/development/social-jobs/status?${params.toString()}`,
+    )
+
+    return status
   },
 }

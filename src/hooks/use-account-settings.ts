@@ -9,6 +9,7 @@ import type {
   AuthUser,
   DevelopmentAccess,
   DevelopmentSocialJobsResult,
+  DevelopmentSocialJobsStatus,
   MutationMessage,
   PublicProfile,
   UserSessionPage,
@@ -177,6 +178,30 @@ export function useAccountSettings({
       )
     },
   })
+  const developmentSocialJobsStatusQuery = useQuery<DevelopmentSocialJobsStatus, Error>({
+    queryKey: [
+      'settings',
+      'development',
+      'social-jobs-status',
+      userId,
+      runDevelopmentSocialJobsMutation.data?.runId,
+    ],
+    queryFn: () => {
+      const runId = runDevelopmentSocialJobsMutation.data?.runId
+
+      if (!runId) {
+        throw new Error('ID da execução dos jobs é obrigatório')
+      }
+
+      return settingsService.getDevelopmentSocialJobsStatus(runId)
+    },
+    enabled: Boolean(userId && runDevelopmentSocialJobsMutation.data?.runId),
+    refetchInterval: (query) => {
+      const status = query.state.data
+
+      return status?.isComplete ? false : 3_000
+    },
+  })
 
   return {
     profileQuery,
@@ -189,5 +214,6 @@ export function useAccountSettings({
     uploadProfileAvatarMutation,
     removeProfileAvatarMutation,
     runDevelopmentSocialJobsMutation,
+    developmentSocialJobsStatusQuery,
   }
 }

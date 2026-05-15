@@ -481,6 +481,7 @@ export function AccountSettingsPage() {
               cooldownEndsAt={developmentAccess?.cooldownEndsAt ?? null}
               isPending={settings.runDevelopmentSocialJobsMutation.isPending}
               result={settings.runDevelopmentSocialJobsMutation.data}
+              status={settings.developmentSocialJobsStatusQuery.data}
               errorMessage={settings.runDevelopmentSocialJobsMutation.error?.message}
               onRunSocialJobs={() => {
                 settings.runDevelopmentSocialJobsMutation.reset()

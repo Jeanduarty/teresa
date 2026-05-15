@@ -2,7 +2,10 @@ import { Clock3, Play, Share2, Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button, Card } from '../../../components/ui'
-import type { DevelopmentSocialJobsResult } from '../../../shared/types/account-types'
+import type {
+  DevelopmentSocialJobsResult,
+  DevelopmentSocialJobsStatus,
+} from '../../../shared/types/account-types'
 import { AccountSettingsFeedback } from './account-settings-feedback'
 
 interface AccountSettingsDevelopmentSectionProps {
@@ -10,6 +13,7 @@ interface AccountSettingsDevelopmentSectionProps {
   cooldownEndsAt: string | null
   isPending: boolean
   result?: DevelopmentSocialJobsResult
+  status?: DevelopmentSocialJobsStatus
   errorMessage?: string
   onRunSocialJobs: () => void
 }
@@ -34,13 +38,23 @@ export function AccountSettingsDevelopmentSection({
   cooldownEndsAt,
   isPending,
   result,
+  status,
   errorMessage,
   onRunSocialJobs,
 }: AccountSettingsDevelopmentSectionProps) {
   const [now, setNow] = useState(() => Date.now())
   const cooldownLabel = formatCooldown(cooldownEndsAt, now)
   const isBlocked = Boolean(cooldownLabel)
-  const canRun = hasConnectedSocialAccount && !isBlocked && !isPending
+  const isJobRunning = Boolean(status && !status.isComplete)
+  const canRun = hasConnectedSocialAccount && !isBlocked && !isPending && !isJobRunning
+  const latestResult = status ?? result
+  const statusMessage = status
+    ? status.errorMessage
+      ? 'O processamento falhou. Verifique o erro acima e tente novamente após o cooldown.'
+      : status.isComplete
+        ? 'Jobs concluídos. Os tópicos gerados já devem aparecer na área principal.'
+        : 'Jobs criados. O processamento continua em segundo plano e esta seção atualiza automaticamente.'
+    : null
 
   useEffect(() => {
     if (!cooldownEndsAt) {
@@ -108,20 +122,27 @@ export function AccountSettingsDevelopmentSection({
             onClick={onRunSocialJobs}
             className="shrink-0"
           >
-            {isPending ? 'Executando...' : 'Executar jobs'}
+            {isPending ? 'Criando jobs...' : isJobRunning ? 'Jobs em andamento' : 'Executar jobs'}
           </Button>
         </div>
 
         <AccountSettingsFeedback tone="error" message={errorMessage} />
+        <AccountSettingsFeedback tone="error" message={status?.errorMessage} />
 
-        {result ? (
+        {statusMessage ? (
+          <p className="mt-4 rounded-[16px] border border-black/10 bg-white px-4 py-3 text-sm font-medium text-[#555]">
+            {statusMessage}
+          </p>
+        ) : null}
+
+        {latestResult ? (
           <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
             <div className="rounded-[16px] border border-black/10 bg-white px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#8a8a8a]">
                 Jobs criados
               </p>
               <p className="mt-1 font-heading text-2xl font-semibold text-[#181818]">
-                {result.enqueuedJobs}
+                {latestResult.enqueuedJobs}
               </p>
             </div>
             <div className="rounded-[16px] border border-black/10 bg-white px-4 py-3">
@@ -129,7 +150,7 @@ export function AccountSettingsDevelopmentSection({
                 Jobs processados
               </p>
               <p className="mt-1 font-heading text-2xl font-semibold text-[#181818]">
-                {result.processedJobs}
+                {latestResult.processedJobs}
               </p>
             </div>
             <div className="rounded-[16px] border border-black/10 bg-white px-4 py-3">
@@ -137,7 +158,7 @@ export function AccountSettingsDevelopmentSection({
                 Tópicos gerados
               </p>
               <p className="mt-1 font-heading text-2xl font-semibold text-[#181818]">
-                {result.generatedTopics}
+                {latestResult.generatedTopics}
               </p>
             </div>
           </div>

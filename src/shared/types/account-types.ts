@@ -109,12 +109,33 @@ export interface DevelopmentAccess {
 }
 
 export interface DevelopmentSocialJobsResult {
+  runId: string
+  startedAt: string
   cooldownEndsAt: string
   skipped: boolean
   scheduledHour: number
+  jobIds: string[]
   enqueuedJobs: number
   processedJobs: number
   generatedTopics: number
+}
+
+export interface DevelopmentSocialJobsStatus {
+  runId: string
+  startedAt: string
+  cooldownEndsAt: string
+  jobIds: string[]
+  enqueuedJobs: number
+  processedJobs: number
+  pendingJobs: number
+  runningJobs: number
+  completedJobs: number
+  failedJobs: number
+  rateLimitedJobs: number
+  generatedTopics: number
+  isProcessing: boolean
+  isComplete: boolean
+  errorMessage: string | null
 }
 
 export interface RevokeSessionResult {
