@@ -8,8 +8,8 @@ export function MetricsPanel({ metrics }: { metrics?: ContentTopicMetrics }) {
     { label: 'Tópicos gerados', value: metrics?.total ?? 0 },
     { label: 'Feitos', value: metrics?.completed ?? 0 },
     { label: 'Pendentes', value: metrics?.pending ?? 0 },
-    { label: 'Sinais do Twitter/X', value: metrics?.twitterSignals ?? 0 },
-    { label: 'Sinais do TikTok', value: metrics?.tiktokSignals ?? 0 },
+    { label: 'Posts do Twitter/X', value: metrics?.twitterSignals ?? 0 },
+    { label: 'Posts do TikTok', value: metrics?.tiktokSignals ?? 0 },
     { label: 'Taxa de conclusao', value: `${metrics?.completionRate ?? 0}%` },
   ]
 

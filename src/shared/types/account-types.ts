@@ -215,32 +215,3 @@ export interface LinkPreview {
   imageUrl: string | null
   siteName: string | null
 }
-
-export interface SocialActivityPost {
-  provider: SocialProvider
-  externalId: string
-  signalType: 'liked' | 'saved'
-  text: string
-  creatorHandle: string | null
-  url: string
-  createdAt: string | null
-  collectedAt: string
-  metrics: {
-    likes: number
-    replies: number
-    reposts: number
-    quotes: number
-  }
-}
-
-export interface SocialDailyLikedPostsResult {
-  provider: SocialProvider
-  supported: boolean
-  collectedAt: string
-  message: string
-  posts: SocialActivityPost[]
-  request?: {
-    requestId: string
-    status: string
-  }
-}

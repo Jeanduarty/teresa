@@ -1,9 +1,5 @@
 import { apiRequest } from '../shared/lib/api-client'
-import type {
-  SocialAccount,
-  SocialDailyLikedPostsResult,
-  SocialProvider,
-} from '../shared/types/account-types'
+import type { SocialAccount, SocialProvider } from '../shared/types/account-types'
 
 interface SocialAuthorization {
   authorizationUrl: string
@@ -29,9 +25,5 @@ export const socialAccountsService = {
       method: 'DELETE',
     })
     return account
-  },
-
-  async getDailyLikedPosts(provider: SocialProvider): Promise<SocialDailyLikedPostsResult> {
-    return apiRequest<SocialDailyLikedPostsResult>(`/social/${provider}/daily-liked-posts`)
   },
 }

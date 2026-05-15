@@ -1,14 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { AtSign, ExternalLink, Link2, Music2, Search, Unplug } from 'lucide-react'
+import { AtSign, Link2, Music2, Unplug } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 
 import { useSocialAccounts } from '../../../hooks/use-social-accounts'
-import type {
-  SocialAccount,
-  SocialDailyLikedPostsResult,
-  SocialProvider,
-} from '../../../shared/types/account-types'
+import type { SocialAccount, SocialProvider } from '../../../shared/types/account-types'
 import { Button, Card } from '../../../components/ui'
 import { AccountSettingsFeedback } from './account-settings-feedback'
 
@@ -97,22 +93,18 @@ function SocialAccountCard({
   account,
   isConnecting,
   isDisconnecting,
-  isFetchingDailyLikedPosts,
   onConnect,
   onDisconnect,
-  onFetchDailyLikedPosts,
 }: {
   account: SocialAccount
   isConnecting: boolean
   isDisconnecting: boolean
-  isFetchingDailyLikedPosts: boolean
   onConnect: (provider: SocialProvider) => void
   onDisconnect: (provider: SocialProvider) => void
-  onFetchDailyLikedPosts: (provider: SocialProvider) => void
 }) {
   const provider = PROVIDER_LABELS[account.provider]
   const Icon = provider.icon
-  const isPending = isConnecting || isDisconnecting || isFetchingDailyLikedPosts
+  const isPending = isConnecting || isDisconnecting
   const statusLabel = account.isConnected ? 'Conectado' : 'Pendente'
 
   return (
@@ -162,17 +154,6 @@ function SocialAccountCard({
               <Button
                 type="button"
                 disabled={isPending}
-                onClick={() => onFetchDailyLikedPosts(account.provider)}
-                variant="secondary"
-                size="sm"
-                icon={<Search className="h-3.5 w-3.5" />}
-              >
-                {isFetchingDailyLikedPosts ? 'Buscando...' : 'Testar sinais'}
-              </Button>
-
-              <Button
-                type="button"
-                disabled={isPending}
                 onClick={() => onDisconnect(account.provider)}
                 variant="danger"
                 size="sm"
@@ -200,62 +181,8 @@ function SocialAccountCard({
   )
 }
 
-function SocialLikedPostsPreview({ result }: { result?: SocialDailyLikedPostsResult }) {
-  if (!result) {
-    return null
-  }
-
-  const provider = PROVIDER_LABELS[result.provider]
-
-  return (
-    <Card as="section" variant="muted" className="rounded-[20px] p-5">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h3 className="font-heading text-lg font-semibold text-[#181818]">
-            Teste de sinais - {provider.label}
-          </h3>
-          <p className="mt-1 text-sm leading-6 text-[#666]">{result.message}</p>
-          {result.request ? (
-            <p className="mt-2 font-mono text-xs text-[#8a8a8a]">
-              Request {result.request.requestId} - {result.request.status}
-            </p>
-          ) : null}
-        </div>
-
-        <span className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold text-[#666]">
-          {result.posts.length} posts
-        </span>
-      </div>
-
-      {result.posts.length > 0 ? (
-        <div className="mt-4 space-y-3">
-          {result.posts.slice(0, 5).map((post) => (
-            <a
-              key={post.externalId}
-              href={post.url}
-              target="_blank"
-              rel="noreferrer"
-              className="block rounded-[16px] border border-black/10 bg-white px-4 py-3 transition-colors hover:bg-[#f4f4f2]"
-            >
-              <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold text-[#666]">
-                <span>
-                  {post.signalType === 'saved' ? 'Salvo' : 'Curtido'} ·{' '}
-                  {post.creatorHandle ?? provider.label}
-                </span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </div>
-              <p className="line-clamp-3 text-sm leading-6 text-[#181818]">{post.text}</p>
-            </a>
-          ))}
-        </div>
-      ) : null}
-    </Card>
-  )
-}
-
 export function AccountSettingsSocialSection({ userId }: AccountSettingsSocialSectionProps) {
-  const { accountsQuery, connectMutation, dailyLikedPostsMutation, disconnectMutation } =
-    useSocialAccounts(userId)
+  const { accountsQuery, connectMutation, disconnectMutation } = useSocialAccounts(userId)
   const [searchParams, setSearchParams] = useSearchParams()
   const [connectionFeedback] = useState<SocialConnectionFeedback | null>(() =>
     getSocialConnectionFeedback(searchParams),
@@ -287,7 +214,7 @@ export function AccountSettingsSocialSection({ userId }: AccountSettingsSocialSe
           Redes sociais
         </h2>
         <p className="mt-3 max-w-[620px] text-[1.02rem] leading-8 text-[#666]">
-          Vincule as contas que autorizam a leitura de sinais de conteudo para gerar briefings automaticos.
+          Vincule as contas que autorizam a leitura de posts para gerar briefings automaticos.
         </p>
       </div>
 
@@ -310,10 +237,6 @@ export function AccountSettingsSocialSection({ userId }: AccountSettingsSocialSe
         <AccountSettingsFeedback tone="error" message={disconnectMutation.error.message} />
       ) : null}
 
-      {dailyLikedPostsMutation.error ? (
-        <AccountSettingsFeedback tone="error" message={dailyLikedPostsMutation.error.message} />
-      ) : null}
-
       <div className="space-y-4">
         {accountsQuery.isLoading
           ? [0, 1].map((item) => (
@@ -329,24 +252,15 @@ export function AccountSettingsSocialSection({ userId }: AccountSettingsSocialSe
                 isDisconnecting={
                   disconnectMutation.isPending && disconnectMutation.variables === account.provider
                 }
-                isFetchingDailyLikedPosts={
-                  dailyLikedPostsMutation.isPending &&
-                  dailyLikedPostsMutation.variables === account.provider
-                }
                 onConnect={(provider) => {
                   connectMutation.mutate(provider)
                 }}
                 onDisconnect={(provider) => {
                   disconnectMutation.mutate(provider)
                 }}
-                onFetchDailyLikedPosts={(provider) => {
-                  dailyLikedPostsMutation.mutate(provider)
-                }}
               />
             ))}
       </div>
-
-      <SocialLikedPostsPreview result={dailyLikedPostsMutation.data} />
     </div>
   )
 }
