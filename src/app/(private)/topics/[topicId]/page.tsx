@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
+import { ConfirmDialog } from '../../../../components/ui'
 import { useAuthSession } from '../../../../hooks/use-auth'
 import { useContentTopicDetail, useTopicGroups } from '../../../../hooks/use-content-topics'
 import { TopicEditFieldDialog, type EditFieldState } from './topic-edit-field-dialog'
@@ -45,6 +46,7 @@ export function TopicDetailsPage() {
   } = useContentTopicDetail({ userId: user?.id, topicId })
   const { groupsQuery } = useTopicGroups(user?.id)
   const [editField, setEditField] = useState<EditFieldState>(null)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
   const topic = topicQuery.data
   const groups = groupsQuery.data ?? []
@@ -62,11 +64,8 @@ export function TopicDetailsPage() {
   }
 
   async function handleDeleteTopic(): Promise<void> {
-    if (!window.confirm('Apagar este topico? Ele ficara com status apagado.')) {
-      return
-    }
-
     await deleteTopicMutation.mutateAsync()
+    setConfirmDeleteOpen(false)
     navigate('/')
   }
 
@@ -97,9 +96,7 @@ export function TopicDetailsPage() {
             onMarkPending={() => {
               void markPendingMutation.mutateAsync()
             }}
-            onDelete={() => {
-              void handleDeleteTopic()
-            }}
+            onDelete={() => setConfirmDeleteOpen(true)}
           />
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -157,6 +154,17 @@ export function TopicDetailsPage() {
                 editField?.field === 'summary' ? { summary: value } : { title: value },
               )
             }
+          />
+
+          <ConfirmDialog
+            open={confirmDeleteOpen}
+            onOpenChange={setConfirmDeleteOpen}
+            title="Apagar este tópico?"
+            description="O tópico ficará com status apagado e sairá da lista principal. Esta ação não pode ser desfeita pela interface."
+            confirmLabel="Apagar tópico"
+            tone="danger"
+            isPending={deleteTopicMutation.isPending}
+            onConfirm={handleDeleteTopic}
           />
         </div>
       ) : null}

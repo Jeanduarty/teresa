@@ -62,7 +62,6 @@ export function AccountSettingsProfileSection({
             name={form.realName || form.userName}
             className="h-20 w-20 border border-white/70 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.38)]"
             iconClassName="h-9 w-9"
-            onChange={onAvatarChange}
           />
 
           <div>

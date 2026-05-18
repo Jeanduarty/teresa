@@ -3,6 +3,7 @@ import { Check, Trash2 } from 'lucide-react'
 
 import {
   Button,
+  ConfirmDialog,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -30,6 +31,7 @@ export function GroupDialog({
   onDelete: (groupId: string) => Promise<unknown>
 }) {
   const [name, setName] = useState(state?.mode === 'edit' ? state.group.name : '')
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
   if (!state) {
     return null
@@ -53,58 +55,79 @@ export function GroupDialog({
     onClose()
   }
 
-  return (
-    <Dialog open onOpenChange={(open) => {
-      if (!open) {
-        onClose()
-      }
-    }}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEditing ? 'Editar grupo' : 'Novo grupo'}</DialogTitle>
-          <DialogDescription>
-            Use grupos para organizar tópicos por projeto, cliente ou linha editorial.
-          </DialogDescription>
-        </DialogHeader>
-      <div className="space-y-4">
-        <Input
-          id="group-dialog-name"
-          label="Nome"
-          value={name}
-          onChange={setName}
-          placeholder="Ex: Ideias para Reels"
-        />
+  async function handleDelete() {
+    if (state?.mode !== 'edit') {
+      return
+    }
 
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          {isEditing ? (
+    await onDelete(state.group.id)
+    setConfirmDeleteOpen(false)
+    onClose()
+  }
+
+  return (
+    <>
+      <Dialog open onOpenChange={(open) => {
+        if (!open) {
+          onClose()
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEditing ? 'Editar grupo' : 'Novo grupo'}</DialogTitle>
+            <DialogDescription>
+              Use grupos para organizar tópicos por projeto, cliente ou linha editorial.
+            </DialogDescription>
+          </DialogHeader>
+        <div className="space-y-4">
+          <Input
+            id="group-dialog-name"
+            label="Nome"
+            value={name}
+            onChange={setName}
+            placeholder="Ex: Ideias para Reels"
+          />
+
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            {isEditing ? (
+              <Button
+                variant="danger"
+                disabled={isDeleting}
+                icon={<Trash2 className="h-4 w-4" />}
+                onClick={() => setConfirmDeleteOpen(true)}
+              >
+                {isDeleting ? 'Apagando...' : 'Apagar'}
+              </Button>
+            ) : null}
+            <Button variant="secondary" onClick={onClose}>
+              Cancelar
+            </Button>
             <Button
-              variant="danger"
-              disabled={isDeleting}
-              icon={<Trash2 className="h-4 w-4" />}
+              disabled={!name.trim() || isSaving}
+              icon={<Check className="h-4 w-4" />}
               onClick={() => {
-                if (window.confirm('Apagar este grupo? Os tópicos continuarao existindo.')) {
-                  void onDelete(state.group.id).then(onClose)
-                }
+                void handleSave()
               }}
             >
-              {isDeleting ? 'Apagando...' : 'Apagar'}
+              {isSaving ? 'Salvando...' : 'Salvar'}
             </Button>
-          ) : null}
-          <Button variant="secondary" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            disabled={!name.trim() || isSaving}
-            icon={<Check className="h-4 w-4" />}
-            onClick={() => {
-              void handleSave()
-            }}
-          >
-            {isSaving ? 'Salvando...' : 'Salvar'}
-          </Button>
+          </div>
         </div>
-      </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {isEditing ? (
+        <ConfirmDialog
+          open={confirmDeleteOpen}
+          onOpenChange={setConfirmDeleteOpen}
+          title="Apagar este grupo?"
+          description="Os tópicos continuarão existindo, apenas perderão o vínculo com este grupo."
+          confirmLabel="Apagar grupo"
+          tone="danger"
+          isPending={isDeleting}
+          onConfirm={handleDelete}
+        />
+      ) : null}
+    </>
   )
 }

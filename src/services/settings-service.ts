@@ -1,4 +1,4 @@
-import { apiBlobRequest, apiRawRequest, apiRequest } from '../shared/lib/api-client'
+import { apiRawRequest, apiRequest } from '../shared/lib/api-client'
 import type {
   AuthUser,
   ChangePasswordInput,
@@ -68,10 +68,6 @@ export const settingsService = {
       method: 'POST',
       body: { password },
     })
-  },
-
-  async getProfileAvatar(): Promise<Blob> {
-    return apiBlobRequest('/settings/avatar')
   },
 
   async uploadProfileAvatar(file: File): Promise<AuthUser> {

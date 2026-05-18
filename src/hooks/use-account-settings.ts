@@ -16,7 +16,6 @@ import type {
 } from '../shared/types/account-types'
 import { useProfile } from './use-profile'
 import { settingsService } from '../services/settings-service'
-import { clearUserAvatarCache } from './use-user-avatar'
 
 interface UseAccountSettingsParams {
   slug: string
@@ -147,8 +146,6 @@ export function useAccountSettings({
       queryClient.setQueryData<AuthUser | null>(['session'], updatedUser)
       syncProfileCache(slug, updatedUser)
       syncProfileCache(updatedUser.userName, updatedUser)
-      clearUserAvatarCache(updatedUser.id)
-      void queryClient.invalidateQueries({ queryKey: ['user-avatar', updatedUser.id] })
     },
   })
 
@@ -158,8 +155,6 @@ export function useAccountSettings({
       queryClient.setQueryData<AuthUser | null>(['session'], updatedUser)
       syncProfileCache(slug, updatedUser)
       syncProfileCache(updatedUser.userName, updatedUser)
-      clearUserAvatarCache(updatedUser.id)
-      void queryClient.invalidateQueries({ queryKey: ['user-avatar', updatedUser.id] })
     },
   })
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, LogOut, Settings } from 'lucide-react'
+import { ChevronDown, LogOut, Newspaper, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { Button } from '../../../components/ui'
@@ -89,10 +89,20 @@ export function PrivateProfileMenu({
 
           <div className="border-t border-black/10">
             <Link
-              to={settingsHref}
+              to="/newsletters"
               role="menuitem"
               onClick={() => setIsOpen(false)}
               className="font-heading flex items-center gap-3 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+            >
+              <Newspaper className="h-4 w-4" />
+              <span>Newsletters</span>
+            </Link>
+
+            <Link
+              to={settingsHref}
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
             >
               <Settings className="h-4 w-4" />
               <span>Configurações</span>

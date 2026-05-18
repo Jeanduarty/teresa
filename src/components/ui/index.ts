@@ -2,6 +2,7 @@ export { Button } from './button'
 export { ButtonAnchor } from './button-anchor'
 export { ButtonLink } from './button-link'
 export { Card } from './card'
+export { ConfirmDialog, type ConfirmDialogProps, type ConfirmDialogTone } from './confirm-dialog'
 export {
   Dialog,
   DialogClose,

@@ -3,6 +3,8 @@ import type {
   HTMLInputTypeAttribute,
   InputHTMLAttributes,
 } from 'react'
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 
 import { cn } from './utils'
 
@@ -42,6 +44,9 @@ export function Input({
   disabled = false,
   ...props
 }: InputProps) {
+  const [showPassword, setShowPassword] = useState(false)
+  const isPassword = type === 'password'
+  const resolvedType = isPassword ? (showPassword ? 'text' : 'password') : type
   const isDangerTone = tone === 'danger'
   const labelClassName = isDangerTone ? 'text-[#d92d20]' : 'text-[#666]'
   const wrapperClassName =
@@ -76,7 +81,7 @@ export function Input({
 
         <input
           id={id}
-          type={type}
+          type={resolvedType}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           onBlur={onBlur}
@@ -89,6 +94,21 @@ export function Input({
           )}
           {...props}
         />
+
+        {isPassword ? (
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className={cn(
+              'flex shrink-0 items-center justify-center text-[#a0a0a0] transition-colors hover:text-[#666]',
+              shape === 'pill' ? 'pr-2' : 'pr-3',
+            )}
+            tabIndex={-1}
+            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        ) : null}
       </div>
 
       {error ? <p className="px-2 text-sm font-medium leading-6 text-red-600">{error}</p> : null}

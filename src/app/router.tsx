@@ -3,13 +3,17 @@ import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'r
 
 import { useAuthSession } from '../hooks/use-auth'
 import { PrivateLayout } from './(private)/_components/private-layout'
+import { ExploreAnalysisPage } from './(private)/explore/[exploreAnalysisId]/page'
+import { ExploreContentDetailPage } from './(private)/explore/[exploreAnalysisId]/contents/[contentId]/page'
+import { ExploreNewAnalysisPage } from './(private)/explore/new/page'
 import { AccountSettingsPage } from './(private)/settings/page'
 import { HomePage } from './(private)/page'
 import { TopicDetailsPage } from './(private)/topics/[topicId]/page'
 import { LoginPage } from './(public)/login/page'
 import { SignupPage } from './(public)/signup/page'
-import { LegalPage } from './public/legal/page'
-import { PublicLandingPage } from './public/page'
+import { LegalPage } from './newsletters/legal/page'
+import { NewsletterDetailPage } from './newsletters/[slug]/page'
+import { NewslettersListPage } from './newsletters/page'
 
 function SessionSync() {
   useAuthSession()
@@ -59,8 +63,18 @@ export function AppRouter() {
           }
         >
           <Route path="/" element={<HomePage />} />
-          <Route path="/groups" element={<HomePage />} />
+          <Route path="/groups" element={<Navigate to="/" replace />} />
           <Route path="/groups/:groupId" element={<HomePage />} />
+          <Route path="/explore" element={<HomePage />} />
+          <Route path="/explore/new" element={<ExploreNewAnalysisPage />} />
+          <Route
+            path="/explore/:exploreAnalysisId"
+            element={<ExploreAnalysisPage />}
+          />
+          <Route
+            path="/explore/:exploreAnalysisId/contents/:contentId"
+            element={<ExploreContentDetailPage />}
+          />
           <Route path="/settings" element={<AccountSettingsPage />} />
           <Route path="/settings/:section" element={<AccountSettingsPage />} />
           <Route path="/topics/:topicId" element={<TopicDetailsPage />} />
@@ -81,8 +95,10 @@ export function AppRouter() {
             </AuthOnly>
           }
         />
-        <Route path="/public" element={<PublicLandingPage />} />
-        <Route path="/app-preview" element={<Navigate to="/public" replace />} />
+        <Route path="/newsletters" element={<NewslettersListPage />} />
+        <Route path="/newsletters/:slug" element={<NewsletterDetailPage />} />
+        <Route path="/public" element={<Navigate to="/newsletters" replace />} />
+        <Route path="/app-preview" element={<Navigate to="/newsletters" replace />} />
         <Route path="/legal/:page" element={<LegalPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

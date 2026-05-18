@@ -235,3 +235,133 @@ export interface LinkPreview {
   imageUrl: string | null
   siteName: string | null
 }
+
+export type ExploreAnalysisStatus =
+  | 'pending'
+  | 'analyzing'
+  | 'completed'
+  | 'failed'
+
+export type ExploreContentStatus =
+  | 'pending'
+  | 'fetching'
+  | 'analyzing'
+  | 'completed'
+  | 'failed'
+
+export interface ExploreContentAnalysis {
+  voiceTone?: string
+  authorityLevel?: string
+  narrativeStyle?: string
+  emotion?: string
+  humorLevel?: string
+  sophistication?: string
+  format?: string
+  hookType?: string
+  hookText?: string
+  ctaType?: string
+  ctaText?: string
+  structure?: string
+  storytellingStyle?: string
+  pacing?: string
+  archetype?: string
+  positioning?: string
+  audience?: string
+  perception?: string
+  patterns?: string[]
+  differentiators?: string[]
+  trendSignals?: string[]
+  summary?: string
+  mainTheme?: string
+  intent?: string
+}
+
+export interface ExploreInsightShareEntry {
+  label: string
+  share: number
+}
+
+export interface ExploreInsightPattern {
+  label: string
+  count: number
+  group?: string
+}
+
+export interface ExploreInsightOpportunity {
+  title: string
+  description: string
+  level?: 'high' | 'medium' | 'low'
+}
+
+export interface ExploreInsightTrend {
+  title: string
+  description: string
+}
+
+export interface ExploreAnalysisInsights {
+  overview?: string
+  dominantFormats?: ExploreInsightShareEntry[]
+  dominantTone?: ExploreInsightShareEntry[]
+  recurringHooks?: ExploreInsightShareEntry[]
+  commonPositionings?: string[]
+  identifiedPatterns?: ExploreInsightPattern[]
+  underexploredOpportunities?: ExploreInsightOpportunity[]
+  emergingTrends?: ExploreInsightTrend[]
+  audienceSignals?: string[]
+  brandingSignals?: string[]
+}
+
+export interface ExploreContent {
+  id: string
+  exploreAnalysisId: string
+  url: string
+  status: ExploreContentStatus
+  platform: string | null
+  creatorHandle: string | null
+  title: string | null
+  description: string | null
+  previewImageUrl: string | null
+  siteName: string | null
+  publishedAt: string | null
+  durationLabel: string | null
+  analysis: ExploreContentAnalysis
+  lastError: string | null
+  analyzedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ExploreAnalysisSummary {
+  id: string
+  userId: string
+  name: string
+  status: ExploreAnalysisStatus
+  linksCount: number
+  analyzedCount: number
+  failedCount: number
+  summary: string | null
+  analyzedAt: string | null
+  lastError: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ExploreAnalysis extends ExploreAnalysisSummary {
+  insights: ExploreAnalysisInsights
+  contents: ExploreContent[]
+}
+
+export interface CreateExploreAnalysisInput {
+  name: string
+  urls: string[]
+}
+
+export interface UpdateExploreAnalysisInput {
+  exploreAnalysisId: string
+  name: string
+}
+
+export interface AddExploreAnalysisLinksInput {
+  exploreAnalysisId: string
+  urls: string[]
+}

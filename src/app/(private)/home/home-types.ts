@@ -4,8 +4,6 @@ import type {
   ContentTopicStatusFilter,
 } from '../../../shared/types/account-types'
 
-export type HomeTab = 'topics' | 'groups'
-
 export type GroupDialogState =
   | { mode: 'create' }
   | { mode: 'edit'; group: ContentTopicGroup }

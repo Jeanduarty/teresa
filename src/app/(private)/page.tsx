@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, Folder, Grid3X3 } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -11,7 +11,9 @@ import {
   TabsTrigger,
 } from '../../components/ui'
 import { useAuthSession } from '../../hooks/use-auth'
+import { useAvatarUpload } from '../../hooks/use-avatar-upload'
 import { useContentTopics, useTopicGroups } from '../../hooks/use-content-topics'
+import { useExploreAnalyses } from '../../hooks/use-explore-analyses'
 import { useSocialAccounts } from '../../hooks/use-social-accounts'
 import { useUserAvatar } from '../../hooks/use-user-avatar'
 import { UserAvatar } from '../../components/user-avatar'
@@ -19,11 +21,12 @@ import type {
   ContentTopicFilters,
   ContentTopicStatusFilter,
 } from '../../shared/types/account-types'
+import { ExploreListPanel } from './explore/_components/explore-list-panel'
 import { GroupDialog } from './home/group-dialog'
-import { GroupsGrid } from './home/groups-grid'
+import { GroupsButton } from './home/groups-button'
+import { HOME_TABS, type HomeTab } from './home/home-tabs'
 import type {
   GroupDialogState,
-  HomeTab,
   TopicFilterActions,
   TopicFiltersState,
   TopicListActions,
@@ -42,14 +45,18 @@ export function HomePage() {
   const { groupId } = useParams<{ groupId?: string }>()
   const { user } = useAuthSession()
   const avatarQuery = useUserAvatar(user)
+  const { uploadMutation: uploadAvatarMutation } = useAvatarUpload()
   const [groupDialogState, setGroupDialogState] = useState<GroupDialogState>(null)
   const [titleFilter, setTitleFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState<ContentTopicStatusFilter>('all')
   const [tagsFilter, setTagsFilter] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [groupsOpen, setGroupsOpen] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const activeTab: HomeTab = location.pathname.startsWith('/groups') ? 'groups' : 'topics'
-  const groupContextId = activeTab === 'groups' ? groupId : undefined
+  const activeTab: HomeTab = location.pathname.startsWith('/explore')
+    ? 'explore'
+    : 'creator'
+  const groupContextId = activeTab === 'creator' ? groupId : undefined
 
   const topicFilters = useMemo<ContentTopicFilters>(
     () => {
@@ -83,6 +90,7 @@ export function HomePage() {
     deleteGroupMutation,
   } = useTopicGroups(user?.id)
   const { accountsQuery } = useSocialAccounts(user?.id)
+  const { analysesQuery } = useExploreAnalyses(user?.id)
 
   const topics = useMemo(() => topicsQuery.data ?? [], [topicsQuery.data])
   const groups = useMemo(() => groupsQuery.data ?? [], [groupsQuery.data])
@@ -134,7 +142,10 @@ export function HomePage() {
   }
   const connectedAccountsCount = accountsQuery.data?.filter((account) => account.isConnected).length ?? 0
   const shouldShowSocialShortcut =
-    !accountsQuery.isLoading && !accountsQuery.error && connectedAccountsCount === 0
+    activeTab === 'creator' &&
+    !accountsQuery.isLoading &&
+    !accountsQuery.error &&
+    connectedAccountsCount === 0
   const socialAccountsLabel = accountsQuery.isLoading
     ? 'Verificando redes'
     : connectedAccountsCount === 1
@@ -181,18 +192,17 @@ export function HomePage() {
 
   function handleTabChange(value: string) {
     const nextTab = value as HomeTab
+    const definition = HOME_TABS.find((tab) => tab.value === nextTab)
 
-    if (nextTab === 'topics') {
-      navigate('/')
-      resetPagination()
+    if (!definition) {
       return
     }
 
     clearFilters()
-    navigate('/groups')
+    navigate(definition.path)
   }
 
-  const topicsContent = (
+  const creatorContent = (
     <>
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -203,7 +213,7 @@ export function HomePage() {
               className="-ml-2 mb-3 rounded-full"
               icon={<ChevronLeft className="h-4 w-4" />}
               onClick={() => {
-                navigate('/groups')
+                navigate('/')
                 resetPagination()
               }}
             >
@@ -220,14 +230,34 @@ export function HomePage() {
           </p>
         </div>
 
-        {!groupContextId ? (
-          <FiltersButton
-            filters={filters}
-            open={filtersOpen}
-            onOpenChange={setFiltersOpen}
-            actions={filterActions}
+        <div className="flex flex-wrap items-center gap-2">
+          <GroupsButton
+            groups={groups}
+            isLoading={groupsQuery.isLoading}
+            open={groupsOpen}
+            onOpenChange={setGroupsOpen}
+            selectedGroupId={groupContextId}
+            onCreate={() => setGroupDialogState({ mode: 'create' })}
+            onEdit={(group) => setGroupDialogState({ mode: 'edit', group })}
+            onSelect={(group) => {
+              if (group) {
+                navigate(`/groups/${group.id}`)
+              } else {
+                navigate('/')
+              }
+              resetPagination()
+            }}
           />
-        ) : null}
+
+          {!groupContextId ? (
+            <FiltersButton
+              filters={filters}
+              open={filtersOpen}
+              onOpenChange={setFiltersOpen}
+              actions={filterActions}
+            />
+          ) : null}
+        </div>
       </div>
 
       {!groupContextId ? (
@@ -251,10 +281,16 @@ export function HomePage() {
       <section className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-6">
           <UserAvatar
+            editable
+            disabled={uploadAvatarMutation.isPending}
             avatarUrl={avatarQuery.avatarUrl}
             name={user?.realName?.trim() || user?.userName || 'Criador'}
             className="h-24 w-24"
             iconClassName="h-12 w-12"
+            onChange={(file) => {
+              uploadAvatarMutation.reset()
+              void uploadAvatarMutation.mutateAsync(file)
+            }}
           />
 
           <div className="min-w-0">
@@ -271,9 +307,6 @@ export function HomePage() {
                 {socialAccountsLabel}
               </Link>
             </div>
-            <p className="mt-4 max-w-[720px] text-base leading-7 text-[#666]">
-              Tópicos gerados automaticamente a partir das curtidas das redes sociais.
-            </p>
           </div>
         </div>
       </section>
@@ -281,12 +314,15 @@ export function HomePage() {
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="mb-8 flex justify-center">
           <TabsList aria-label="Visualizacao da home">
-            <TabsTrigger value="topics" aria-label="Tópicos">
-              <Grid3X3 className="h-5 w-5" />
-            </TabsTrigger>
-            <TabsTrigger value="groups" aria-label="Grupos">
-              <Folder className="h-5 w-5" />
-            </TabsTrigger>
+            {HOME_TABS.map((tab) => {
+              const Icon = tab.icon
+
+              return (
+                <TabsTrigger key={tab.value} value={tab.value} aria-label={tab.ariaLabel}>
+                  <Icon className="h-5 w-5" />
+                </TabsTrigger>
+              )
+            })}
           </TabsList>
         </div>
 
@@ -308,25 +344,16 @@ export function HomePage() {
             </div>
           ) : null}
 
-          <TabsContent value="topics" className="mt-0">
-            {topicsContent}
+          <TabsContent value="creator" className="mt-0">
+            {creatorContent}
           </TabsContent>
 
-          <TabsContent value="groups" className="mt-0">
-            {groupContextId ? (
-              topicsContent
-            ) : (
-              <GroupsGrid
-                groups={groups}
-                isLoading={groupsQuery.isLoading}
-                onCreate={() => setGroupDialogState({ mode: 'create' })}
-                onEdit={(group) => setGroupDialogState({ mode: 'edit', group })}
-                onSelect={(group) => {
-                  navigate(`/groups/${group.id}`)
-                  resetPagination()
-                }}
-              />
-            )}
+          <TabsContent value="explore" className="mt-0">
+            <ExploreListPanel
+              analyses={analysesQuery.data ?? []}
+              isLoading={analysesQuery.isLoading}
+              errorMessage={analysesQuery.error?.message}
+            />
           </TabsContent>
         </section>
       </Tabs>
@@ -341,7 +368,7 @@ export function HomePage() {
         onUpdate={(groupId, name) => updateGroupMutation.mutateAsync({ groupId, name })}
         onDelete={(groupId) => {
           if (groupContextId === groupId) {
-            navigate('/groups')
+            navigate('/')
           }
 
           return deleteGroupMutation.mutateAsync(groupId)
