@@ -16,6 +16,8 @@ import { useContentTopics, useTopicGroups } from '../../hooks/use-content-topics
 import { useExploreAnalyses } from '../../hooks/use-explore-analyses'
 import { useSocialAccounts } from '../../hooks/use-social-accounts'
 import { useUserAvatar } from '../../hooks/use-user-avatar'
+import { useUserSocialJobs } from '../../hooks/use-user-social-jobs'
+import { RunSocialJobsCard } from '../../components/run-social-jobs-card'
 import { UserAvatar } from '../../components/user-avatar'
 import type {
   ContentTopicFilters,
@@ -90,6 +92,7 @@ export function HomePage() {
     deleteGroupMutation,
   } = useTopicGroups(user?.id)
   const { accountsQuery } = useSocialAccounts(user?.id)
+  const { accessQuery, runMutation, statusQuery } = useUserSocialJobs(user?.id)
   const { analysesQuery } = useExploreAnalyses(user?.id)
 
   const topics = useMemo(() => topicsQuery.data ?? [], [topicsQuery.data])
@@ -264,6 +267,17 @@ export function HomePage() {
         <ActiveFilters
           filters={filters}
           actions={filterActions}
+        />
+      ) : null}
+
+      {!groupContextId ? (
+        <RunSocialJobsCard
+          hasConnectedSocialAccount={accessQuery.data?.hasConnectedSocialAccount ?? false}
+          cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
+          isPending={runMutation.isPending}
+          result={runMutation.data}
+          status={statusQuery.data}
+          onRun={() => runMutation.mutate()}
         />
       ) : null}
 

@@ -1,4 +1,4 @@
-export type NewsletterCategory =
+export type NovidadeCategory =
   | 'Lançamento'
   | 'Melhoria'
   | 'Correção'
@@ -6,26 +6,26 @@ export type NewsletterCategory =
   | 'Workflow'
   | 'Produto'
 
-export type NewsletterSection =
+export type NovidadeSection =
   | { type: 'paragraph'; text: string }
   | { type: 'heading'; text: string }
   | { type: 'list'; items: string[] }
   | { type: 'quote'; text: string; author?: string }
   | { type: 'note'; text: string }
 
-export interface NewsletterHighlight {
+export interface NovidadeHighlight {
   title: string
   description: string
 }
 
-export interface Newsletter {
+export interface Novidade {
   slug: string
-  category: NewsletterCategory
+  category: NovidadeCategory
   date: string
   publishedAt: string
   title: string
   summary: string
   readTime: string
-  highlights?: NewsletterHighlight[]
-  sections: NewsletterSection[]
+  highlights?: NovidadeHighlight[]
+  sections: NovidadeSection[]
 }

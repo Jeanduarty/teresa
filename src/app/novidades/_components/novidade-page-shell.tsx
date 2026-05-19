@@ -4,22 +4,22 @@ import { Link, useLocation } from 'react-router-dom'
 
 import { Logo } from '../../../shared/branding/logo'
 
-type ActivePath = 'newsletters' | 'terms' | 'privacy'
+type ActivePath = 'novidades' | 'terms' | 'privacy'
 
-interface NewsletterPageShellProps {
+interface NovidadePageShellProps {
   activePath?: ActivePath
 }
 
 const navItems: { label: string; to: string; activePath: ActivePath }[] = [
-  { label: 'Novidades', to: '/newsletters', activePath: 'newsletters' },
+  { label: 'Novidades', to: '/novidades', activePath: 'novidades' },
   { label: 'Termos', to: '/legal/terms', activePath: 'terms' },
   { label: 'Privacidade', to: '/legal/privacy', activePath: 'privacy' },
 ]
 
-export function NewsletterPageShell({
+export function NovidadePageShell({
   activePath,
   children,
-}: PropsWithChildren<NewsletterPageShellProps>) {
+}: PropsWithChildren<NovidadePageShellProps>) {
   const location = useLocation()
   const resolvedActive =
     activePath ??
@@ -27,13 +27,13 @@ export function NewsletterPageShell({
       ? 'privacy'
       : location.pathname.startsWith('/legal/terms')
         ? 'terms'
-        : 'newsletters')
+        : 'novidades')
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-[#181818]">
       <header className="sticky top-0 z-30 border-b border-black/5 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1128px] flex-col gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between md:px-0">
-          <Link to="/newsletters" aria-label="Ir para novidades da Teresa">
+          <Link to="/novidades" aria-label="Ir para novidades da Teresa">
             <Logo
               imageClassName="h-9 w-9"
               textClassName="text-[1.02rem] tracking-[0.14em]"

@@ -137,6 +137,39 @@ export interface DevelopmentSocialJobsStatus {
   errorMessage: string | null
 }
 
+export interface UserSocialJobsAccess {
+  hasConnectedSocialAccount: boolean
+  cooldownEndsAt: string | null
+}
+
+export interface UserSocialJobsResult {
+  runId: string
+  startedAt: string
+  cooldownEndsAt: string
+  jobIds: string[]
+  enqueuedJobs: number
+  processedJobs: number
+  generatedTopics: number
+}
+
+export interface UserSocialJobsStatus {
+  runId: string
+  startedAt: string
+  cooldownEndsAt: string
+  jobIds: string[]
+  enqueuedJobs: number
+  processedJobs: number
+  pendingJobs: number
+  runningJobs: number
+  completedJobs: number
+  failedJobs: number
+  rateLimitedJobs: number
+  generatedTopics: number
+  isProcessing: boolean
+  isComplete: boolean
+  errorMessage: string | null
+}
+
 export interface RevokeSessionResult {
   sessionId: string
   shouldLogout: boolean
@@ -146,6 +179,8 @@ export type SocialProvider = 'twitter' | 'tiktok'
 export type ContentTopicStatus = 'pending' | 'completed' | 'deleted'
 export type ContentTopicStatusFilter = 'pending' | 'completed' | 'all'
 
+export type TikTokWebSessionStatus = 'active' | 'expired' | 'pending_login' | 'failed' | null
+
 export interface SocialAccount {
   id: string
   userId: string
@@ -154,6 +189,9 @@ export interface SocialAccount {
   isConnected: boolean
   connectedAt: string | null
   permissions: string[]
+  webSessionStatus: TikTokWebSessionStatus
+  webSessionUpdated: string | null
+  webHandle: string | null
 }
 
 export interface ContentTopic {

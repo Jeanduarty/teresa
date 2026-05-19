@@ -1,6 +1,6 @@
 import { Navigate, useParams } from 'react-router-dom'
 
-import { NewsletterPageShell } from '../_components/newsletter-page-shell'
+import { NovidadePageShell } from '../_components/novidade-page-shell'
 
 type LegalPageSlug = 'terms' | 'privacy'
 
@@ -154,7 +154,7 @@ export function LegalPage() {
   const content = legalPages[page]
 
   return (
-    <NewsletterPageShell activePath={page}>
+    <NovidadePageShell activePath={page}>
       <main className="mx-auto w-full max-w-[960px] px-6 py-10 md:px-0 md:py-14">
         <header className="mb-8">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#888]">
@@ -199,6 +199,6 @@ export function LegalPage() {
           transparência do usuário e revisão da aplicação.
         </p>
       </main>
-    </NewsletterPageShell>
+    </NovidadePageShell>
   )
 }

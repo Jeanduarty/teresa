@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { AtSign, Link2, Music2, Unplug } from 'lucide-react'
+import { AtSign, Link2, Music2, RefreshCw, Unplug } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 
 import { useSocialAccounts } from '../../../hooks/use-social-accounts'
 import type { SocialAccount, SocialProvider } from '../../../shared/types/account-types'
 import { Button, Card } from '../../../components/ui'
+import { TikTokLoginModal } from '../../../components/tiktok-login-modal'
 import { AccountSettingsFeedback } from './account-settings-feedback'
 
 interface AccountSettingsSocialSectionProps {
@@ -89,23 +90,44 @@ function getSocialConnectionFeedback(
   return null
 }
 
+function getTikTokStatusLabel(account: SocialAccount): string {
+  if (account.webSessionStatus === 'active') return 'Sessão web ativa'
+  if (account.webSessionStatus === 'expired') return 'Sessão expirada'
+  if (account.webSessionStatus === 'failed') return 'Falha no último login'
+  return 'Não conectado'
+}
+
+function getTwitterStatusLabel(account: SocialAccount): string {
+  return account.isConnected ? 'Conectado' : 'Pendente'
+}
+
 function SocialAccountCard({
   account,
   isConnecting,
   isDisconnecting,
   onConnect,
   onDisconnect,
+  onOpenTikTokLogin,
 }: {
   account: SocialAccount
   isConnecting: boolean
   isDisconnecting: boolean
   onConnect: (provider: SocialProvider) => void
   onDisconnect: (provider: SocialProvider) => void
+  onOpenTikTokLogin: () => void
 }) {
   const provider = PROVIDER_LABELS[account.provider]
   const Icon = provider.icon
   const isPending = isConnecting || isDisconnecting
-  const statusLabel = account.isConnected ? 'Conectado' : 'Pendente'
+  const isTikTok = account.provider === 'tiktok'
+
+  const statusLabel = isTikTok ? getTikTokStatusLabel(account) : getTwitterStatusLabel(account)
+
+  const tiktokActive = isTikTok && account.webSessionStatus === 'active'
+  const tiktokExpired = isTikTok && account.webSessionStatus === 'expired'
+  const tiktokConnected = isTikTok ? tiktokActive : account.isConnected
+  const displayHandle = isTikTok ? account.webHandle ?? account.handle : account.handle
+  const displayDate = isTikTok ? account.webSessionUpdated : account.connectedAt
 
   return (
     <Card as="article" className="overflow-hidden rounded-[22px] shadow-[0_16px_42px_-34px_rgba(0,0,0,0.45)]">
@@ -125,7 +147,13 @@ function SocialAccountCard({
                 <h3 className="font-heading text-[1.2rem] font-semibold text-[#181818]">
                   {provider.label}
                 </h3>
-                <span className="text-sm font-medium text-[#666]">{statusLabel}</span>
+                <span
+                  className={`text-sm font-medium ${
+                    tiktokExpired ? 'text-amber-700' : 'text-[#666]'
+                  }`}
+                >
+                  {statusLabel}
+                </span>
               </div>
 
               <dl className="mt-4 grid gap-x-8 gap-y-3 text-sm text-[#666] sm:grid-cols-2">
@@ -134,22 +162,54 @@ function SocialAccountCard({
                     Perfil
                   </dt>
                   <dd className="font-heading mt-1 font-medium text-[#181818]">
-                    {account.handle ?? 'Aguardando vinculo'}
+                    {displayHandle ?? 'Aguardando vinculo'}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-[#8a8a8a]">
-                    Vinculado em
+                    {isTikTok ? 'Sessão atualizada em' : 'Vinculado em'}
                   </dt>
                   <dd className="mt-1 font-heading font-medium text-[#181818]">
-                    {formatConnectedDate(account.connectedAt)}
+                    {formatConnectedDate(displayDate)}
                   </dd>
                 </div>
               </dl>
             </div>
           </div>
 
-          {account.isConnected ? (
+          {isTikTok ? (
+            <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+              {tiktokActive ? (
+                <Button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() => onDisconnect(account.provider)}
+                  variant="danger"
+                  size="sm"
+                  icon={<Unplug className="h-3.5 w-3.5" />}
+                >
+                  {isDisconnecting ? 'Removendo...' : 'Desvincular'}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  disabled={isPending}
+                  onClick={onOpenTikTokLogin}
+                  variant="secondary"
+                  size="sm"
+                  icon={
+                    tiktokExpired ? (
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    ) : (
+                      <Link2 className="h-3.5 w-3.5" />
+                    )
+                  }
+                >
+                  {tiktokExpired ? 'Reconectar' : 'Vincular'}
+                </Button>
+              )}
+            </div>
+          ) : tiktokConnected ? (
             <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
               <Button
                 type="button"
@@ -187,6 +247,7 @@ export function AccountSettingsSocialSection({ userId }: AccountSettingsSocialSe
   const [connectionFeedback] = useState<SocialConnectionFeedback | null>(() =>
     getSocialConnectionFeedback(searchParams),
   )
+  const [tiktokModalOpen, setTiktokModalOpen] = useState(false)
   const refetchAccounts = accountsQuery.refetch
 
   useEffect(() => {
@@ -253,14 +314,25 @@ export function AccountSettingsSocialSection({ userId }: AccountSettingsSocialSe
                   disconnectMutation.isPending && disconnectMutation.variables === account.provider
                 }
                 onConnect={(provider) => {
-                  connectMutation.mutate(provider)
+                  if (provider === 'twitter') {
+                    connectMutation.mutate(provider)
+                  }
                 }}
                 onDisconnect={(provider) => {
                   disconnectMutation.mutate(provider)
                 }}
+                onOpenTikTokLogin={() => setTiktokModalOpen(true)}
               />
             ))}
       </div>
+
+      <TikTokLoginModal
+        open={tiktokModalOpen}
+        onOpenChange={setTiktokModalOpen}
+        onConnected={() => {
+          void refetchAccounts()
+        }}
+      />
     </div>
   )
 }

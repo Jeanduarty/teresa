@@ -89,13 +89,13 @@ export function PrivateProfileMenu({
 
           <div className="border-t border-black/10">
             <Link
-              to="/newsletters"
+              to="/novidades"
               role="menuitem"
               onClick={() => setIsOpen(false)}
               className="font-heading flex items-center gap-3 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
             >
               <Newspaper className="h-4 w-4" />
-              <span>Newsletters</span>
+              <span>Novidades</span>
             </Link>
 
             <Link

@@ -1,9 +1,9 @@
 import { ArrowLeft, ArrowRight, Clock3, Sparkles } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 
-import { NEWSLETTERS, getNewsletterBySlug } from '../_content'
-import type { Newsletter, NewsletterSection } from '../_content'
-import { NewsletterPageShell } from '../_components/newsletter-page-shell'
+import { NOVIDADES, getNovidadeBySlug } from '../_content'
+import type { Novidade, NovidadeSection } from '../_content'
+import { NovidadePageShell } from '../_components/novidade-page-shell'
 
 const CATEGORY_STYLES: Record<string, string> = {
   Lançamento: 'bg-[#181818] text-white',
@@ -18,7 +18,7 @@ function getCategoryClass(category: string): string {
   return CATEGORY_STYLES[category] ?? CATEGORY_STYLES.Workflow
 }
 
-function SectionRenderer({ section }: { section: NewsletterSection }) {
+function SectionRenderer({ section }: { section: NovidadeSection }) {
   if (section.type === 'heading') {
     return (
       <h2 className="font-heading mt-10 text-2xl font-bold leading-tight text-[#141414] first:mt-0 sm:text-[1.75rem]">
@@ -55,7 +55,7 @@ function SectionRenderer({ section }: { section: NewsletterSection }) {
     return (
       <blockquote className="mt-6 border-l-2 border-[#181818] bg-[#fbfbfa] px-5 py-4">
         <p className="font-heading text-lg leading-relaxed text-[#222]">
-          “{section.text}”
+          "{section.text}"
         </p>
         {section.author ? (
           <p className="mt-2 text-sm font-medium text-[#666]">— {section.author}</p>
@@ -76,10 +76,10 @@ function SectionRenderer({ section }: { section: NewsletterSection }) {
   return null
 }
 
-function NewsletterCard({ entry }: { entry: Newsletter }) {
+function NovidadeCard({ entry }: { entry: Novidade }) {
   return (
     <Link
-      to={`/newsletters/${entry.slug}`}
+      to={`/novidades/${entry.slug}`}
       className="group flex h-full flex-col rounded-[20px] border border-black/10 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_18px_44px_-32px_rgba(0,0,0,0.4)]"
     >
       <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -106,24 +106,24 @@ function NewsletterCard({ entry }: { entry: Newsletter }) {
   )
 }
 
-export function NewsletterDetailPage() {
+export function NovidadeDetailPage() {
   const { slug } = useParams<{ slug: string }>()
-  const entry = slug ? getNewsletterBySlug(slug) : null
+  const entry = slug ? getNovidadeBySlug(slug) : null
 
   if (!entry) {
-    return <Navigate to="/newsletters" replace />
+    return <Navigate to="/novidades" replace />
   }
 
-  const index = NEWSLETTERS.findIndex((item) => item.slug === entry.slug)
-  const related = NEWSLETTERS.filter((item) => item.slug !== entry.slug).slice(0, 3)
-  const previousEntry = index >= 0 ? NEWSLETTERS[index + 1] : undefined
-  const nextEntry = index > 0 ? NEWSLETTERS[index - 1] : undefined
+  const index = NOVIDADES.findIndex((item) => item.slug === entry.slug)
+  const related = NOVIDADES.filter((item) => item.slug !== entry.slug).slice(0, 3)
+  const previousEntry = index >= 0 ? NOVIDADES[index + 1] : undefined
+  const nextEntry = index > 0 ? NOVIDADES[index - 1] : undefined
 
   return (
-    <NewsletterPageShell activePath="newsletters">
+    <NovidadePageShell activePath="novidades">
       <main className="mx-auto w-full max-w-[760px] px-6 py-10 md:px-0 md:py-16">
         <Link
-          to="/newsletters"
+          to="/novidades"
           className="inline-flex items-center gap-2 text-sm font-semibold text-[#666] transition-colors hover:text-[#141414]"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -188,7 +188,7 @@ export function NewsletterDetailPage() {
           >
             {previousEntry ? (
               <Link
-                to={`/newsletters/${previousEntry.slug}`}
+                to={`/novidades/${previousEntry.slug}`}
                 className="group rounded-[18px] border border-black/10 bg-white p-4 transition-all hover:border-black/20 hover:shadow-sm"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888]">
@@ -204,7 +204,7 @@ export function NewsletterDetailPage() {
 
             {nextEntry ? (
               <Link
-                to={`/newsletters/${nextEntry.slug}`}
+                to={`/novidades/${nextEntry.slug}`}
                 className="group rounded-[18px] border border-black/10 bg-white p-4 text-right transition-all hover:border-black/20 hover:shadow-sm"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888]">
@@ -227,12 +227,12 @@ export function NewsletterDetailPage() {
             </h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
-                <NewsletterCard key={item.slug} entry={item} />
+                <NovidadeCard key={item.slug} entry={item} />
               ))}
             </div>
           </section>
         ) : null}
       </main>
-    </NewsletterPageShell>
+    </NovidadePageShell>
   )
 }

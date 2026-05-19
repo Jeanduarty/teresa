@@ -17,7 +17,7 @@ export function useSocialAccounts(userId?: string) {
     enabled: Boolean(userId),
   })
 
-  const connectMutation = useMutation<{ authorizationUrl: string }, Error, SocialProvider>({
+  const connectMutation = useMutation<{ authorizationUrl: string }, Error, 'twitter'>({
     mutationFn: (provider) => {
       if (!userId) {
         throw new Error('ID do usuário é obrigatório')

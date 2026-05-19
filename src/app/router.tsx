@@ -11,9 +11,9 @@ import { HomePage } from './(private)/page'
 import { TopicDetailsPage } from './(private)/topics/[topicId]/page'
 import { LoginPage } from './(public)/login/page'
 import { SignupPage } from './(public)/signup/page'
-import { LegalPage } from './newsletters/legal/page'
-import { NewsletterDetailPage } from './newsletters/[slug]/page'
-import { NewslettersListPage } from './newsletters/page'
+import { LegalPage } from './novidades/legal/page'
+import { NovidadeDetailPage } from './novidades/[slug]/page'
+import { NovidadesListPage } from './novidades/page'
 
 function SessionSync() {
   useAuthSession()
@@ -95,10 +95,10 @@ export function AppRouter() {
             </AuthOnly>
           }
         />
-        <Route path="/newsletters" element={<NewslettersListPage />} />
-        <Route path="/newsletters/:slug" element={<NewsletterDetailPage />} />
-        <Route path="/public" element={<Navigate to="/newsletters" replace />} />
-        <Route path="/app-preview" element={<Navigate to="/newsletters" replace />} />
+        <Route path="/novidades" element={<NovidadesListPage />} />
+        <Route path="/novidades/:slug" element={<NovidadeDetailPage />} />
+        <Route path="/public" element={<Navigate to="/novidades" replace />} />
+        <Route path="/app-preview" element={<Navigate to="/novidades" replace />} />
         <Route path="/legal/:page" element={<LegalPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

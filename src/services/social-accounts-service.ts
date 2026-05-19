@@ -11,7 +11,7 @@ export const socialAccountsService = {
     return accounts
   },
 
-  async connectAccount(provider: SocialProvider): Promise<SocialAuthorization> {
+  async connectAccount(provider: 'twitter'): Promise<SocialAuthorization> {
     return apiRequest<SocialAuthorization>(`/social/${provider}/connect`, {
       method: 'POST',
       body: {

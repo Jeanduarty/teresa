@@ -1,8 +1,8 @@
 import { ArrowRight, Clock3, Mail, Radio, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-import { NEWSLETTERS } from './_content'
-import { NewsletterPageShell } from './_components/newsletter-page-shell'
+import { NOVIDADES } from './_content'
+import { NovidadePageShell } from './_components/novidade-page-shell'
 
 const CATEGORY_STYLES: Record<string, string> = {
   Lançamento: 'bg-[#181818] text-white',
@@ -17,11 +17,11 @@ function getCategoryClass(category: string): string {
   return CATEGORY_STYLES[category] ?? CATEGORY_STYLES.Workflow
 }
 
-export function NewslettersListPage() {
-  const [featured, ...rest] = NEWSLETTERS
+export function NovidadesListPage() {
+  const [featured, ...rest] = NOVIDADES
 
   return (
-    <NewsletterPageShell activePath="newsletters">
+    <NovidadePageShell activePath="novidades">
       <main className="mx-auto w-full max-w-[1128px] px-6 py-10 md:px-0 md:py-16">
         <section className="mb-10 flex flex-col gap-4">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[#666]">
@@ -42,7 +42,7 @@ export function NewslettersListPage() {
 
         {featured ? (
           <Link
-            to={`/newsletters/${featured.slug}`}
+            to={`/novidades/${featured.slug}`}
             className="group mb-10 block overflow-hidden rounded-[28px] border border-black/10 bg-white shadow-[0_24px_60px_-44px_rgba(0,0,0,0.4)] transition-all hover:-translate-y-0.5 hover:shadow-[0_28px_70px_-40px_rgba(0,0,0,0.45)]"
           >
             <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_minmax(0,260px)] lg:items-end lg:p-10">
@@ -112,7 +112,7 @@ export function NewslettersListPage() {
               {rest.map((entry) => (
                 <Link
                   key={entry.slug}
-                  to={`/newsletters/${entry.slug}`}
+                  to={`/novidades/${entry.slug}`}
                   className="group flex h-full flex-col rounded-[22px] border border-black/10 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_22px_48px_-34px_rgba(0,0,0,0.45)]"
                 >
                   <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -151,6 +151,6 @@ export function NewslettersListPage() {
           </section>
         ) : null}
       </main>
-    </NewsletterPageShell>
+    </NovidadePageShell>
   )
 }

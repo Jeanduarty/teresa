@@ -1,6 +1,6 @@
-import type { Newsletter } from './types'
+import type { Novidade } from './types'
 
-export const newsletter: Newsletter = {
+export const novidade: Novidade = {
   slug: '2026-05-12-curtidas-pautas',
   category: 'Workflow',
   date: '12 mai 2026',
