@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Sparkles } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -17,7 +17,6 @@ import { useExploreAnalyses } from '../../hooks/use-explore-analyses'
 import { useSocialAccounts } from '../../hooks/use-social-accounts'
 import { useUserAvatar } from '../../hooks/use-user-avatar'
 import { useUserSocialJobs } from '../../hooks/use-user-social-jobs'
-import { RunSocialJobsCard } from '../../components/run-social-jobs-card'
 import { UserAvatar } from '../../components/user-avatar'
 import type {
   ContentTopicFilters,
@@ -143,6 +142,16 @@ export function HomePage() {
       void removeGroupMutation.mutateAsync({ topicId, groupId })
     },
   }
+  const isJobRunning = Boolean(statusQuery.data && !statusQuery.data.isComplete)
+  const hasCooldown = Boolean(
+    accessQuery.data?.cooldownEndsAt &&
+    new Date(accessQuery.data.cooldownEndsAt).getTime() > Date.now(),
+  )
+  const canRunSocialJob =
+    (accessQuery.data?.hasConnectedSocialAccount ?? false) &&
+    !hasCooldown &&
+    !runMutation.isPending &&
+    !isJobRunning
   const connectedAccountsCount = accountsQuery.data?.filter((account) => account.isConnected).length ?? 0
   const shouldShowSocialShortcut =
     activeTab === 'creator' &&
@@ -253,6 +262,19 @@ export function HomePage() {
           />
 
           {!groupContextId ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-full my-auto"
+              icon={<Sparkles className="h-4 w-4" />}
+              disabled={!canRunSocialJob}
+              onClick={() => runMutation.mutate()}
+            >
+              {runMutation.isPending ? 'Criando...' : isJobRunning ? 'Processando' : 'Gerar tópicos'}
+            </Button>
+          ) : null}
+
+          {!groupContextId ? (
             <FiltersButton
               filters={filters}
               open={filtersOpen}
@@ -267,17 +289,6 @@ export function HomePage() {
         <ActiveFilters
           filters={filters}
           actions={filterActions}
-        />
-      ) : null}
-
-      {!groupContextId ? (
-        <RunSocialJobsCard
-          hasConnectedSocialAccount={accessQuery.data?.hasConnectedSocialAccount ?? false}
-          cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
-          isPending={runMutation.isPending}
-          result={runMutation.data}
-          status={statusQuery.data}
-          onRun={() => runMutation.mutate()}
         />
       ) : null}
 
