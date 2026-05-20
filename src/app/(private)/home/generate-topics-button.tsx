@@ -94,6 +94,30 @@ function StatCard({
   )
 }
 
+const PHASE_LABEL: Record<string, string> = {
+  collecting: 'Buscando posts curtidos...',
+  transcribing: 'Transcrevendo vídeos...',
+  generating_topics: 'Gerando tópicos com IA...',
+}
+
+function TranscriptionProgress({ done, total }: { done: number; total: number }) {
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0
+  return (
+    <div className="mt-3">
+      <div className="mb-1 flex items-center justify-between text-[10px] text-[#666]">
+        <span>{done} de {total} vídeos transcritos</span>
+        <span>{pct}%</span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#ebebeb]">
+        <div
+          className="h-full rounded-full bg-[#1d9a52] transition-all duration-300"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsStatus; isStatusError?: boolean }) {
   if (!status) {
     return (
@@ -113,21 +137,35 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
     )
   }
 
+  const phaseLabel = status.phase ? PHASE_LABEL[status.phase] : 'Processando...'
+  const isTranscribing = status.phase === 'transcribing'
+
   return (
     <div>
       <div className="mb-4">
-        <h3 className="font-heading text-base font-semibold text-[#181818]">Gerando tópicos</h3>
+        <h3 className="font-heading text-base font-semibold text-[#181818]">
+          {phaseLabel}
+        </h3>
+        {status.postsCollected > 0 && (
+          <p className="mt-1 text-[11px] text-[#666]">
+            {status.postsCollected} {status.postsCollected === 1 ? 'post curtido buscado' : 'posts curtidos buscados'}
+          </p>
+        )}
       </div>
 
+      {isTranscribing && status.totalVideosToTranscribe > 0 && (
+        <TranscriptionProgress done={status.transcribedVideos} total={status.totalVideosToTranscribe} />
+      )}
+
       {status.jobs.length > 0 && (
-        <div className="mb-4 space-y-2">
+        <div className="mt-4 space-y-2">
           {status.jobs.map(job => (
             <JobProgressCard key={job.id} job={job} />
           ))}
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         {status.failedJobs > 0 && (
           <div className="col-span-2">
             <StatCard label="Com erro" value={status.failedJobs} variant="error" />
