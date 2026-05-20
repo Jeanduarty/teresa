@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, Sparkles } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -24,6 +24,7 @@ import type {
 } from '../../shared/types/account-types'
 import { ExploreListPanel } from './explore/_components/explore-list-panel'
 import { GroupDialog } from './home/group-dialog'
+import { GenerateTopicsButton } from './home/generate-topics-button'
 import { GroupsButton } from './home/groups-button'
 import { HOME_TABS, type HomeTab } from './home/home-tabs'
 import type {
@@ -147,11 +148,11 @@ export function HomePage() {
     accessQuery.data?.cooldownEndsAt &&
     new Date(accessQuery.data.cooldownEndsAt).getTime() > Date.now(),
   )
+  const isProcessing = runMutation.isPending || isJobRunning
   const canRunSocialJob =
     (accessQuery.data?.hasConnectedSocialAccount ?? false) &&
     !hasCooldown &&
-    !runMutation.isPending &&
-    !isJobRunning
+    !isProcessing
   const connectedAccountsCount = accountsQuery.data?.filter((account) => account.isConnected).length ?? 0
   const shouldShowSocialShortcut =
     activeTab === 'creator' &&
@@ -262,16 +263,14 @@ export function HomePage() {
           />
 
           {!groupContextId ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              className="rounded-full my-auto"
-              icon={<Sparkles className="h-4 w-4" />}
-              disabled={!canRunSocialJob}
-              onClick={() => runMutation.mutate()}
-            >
-              {runMutation.isPending ? 'Criando...' : isJobRunning ? 'Processando' : 'Gerar tópicos'}
-            </Button>
+            <GenerateTopicsButton
+              canRun={canRunSocialJob}
+              isProcessing={isProcessing}
+              hasCooldown={hasCooldown}
+              cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
+              status={statusQuery.data}
+              onRun={() => runMutation.mutate()}
+            />
           ) : null}
 
           {!groupContextId ? (
