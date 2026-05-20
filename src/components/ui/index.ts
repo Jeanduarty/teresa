@@ -15,6 +15,7 @@ export {
 export { Input } from './input'
 export {
   Popover,
+  PopoverAnchor,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,

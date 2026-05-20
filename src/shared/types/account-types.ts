@@ -152,6 +152,17 @@ export interface UserSocialJobsResult {
   generatedTopics: number
 }
 
+export interface UserSocialJobProgress {
+  id: string
+  provider: string
+  status: string
+  postsRead: number
+  newPosts: number
+  pagesFetched: number
+  stoppedReason: string | null
+  lastError: string | null
+}
+
 export interface UserSocialJobsStatus {
   runId: string
   startedAt: string
@@ -168,6 +179,7 @@ export interface UserSocialJobsStatus {
   isProcessing: boolean
   isComplete: boolean
   errorMessage: string | null
+  jobs: UserSocialJobProgress[]
 }
 
 export interface RevokeSessionResult {

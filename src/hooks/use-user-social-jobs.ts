@@ -69,26 +69,27 @@ export function useUserSocialJobs(userId?: string) {
       return userSocialJobsService.getUserSocialJobsStatus(activeRunId)
     },
     enabled: !!activeRunId && !!userId,
-    retry: 1,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(2000 * 2 ** attempt, 15_000),
     refetchInterval: (query) => {
-      const data = query.state.data
-      if (!data) return false
-      return data.isComplete ? false : 3000
+      if (query.state.data?.isComplete) return false
+      if (!query.queryKey[3]) return false
+      return query.state.status === 'error' ? 10_000 : 3_000
     },
   })
 
   useEffect(() => {
     if (!userId || !storedRunId) return
-    const shouldClear = statusQuery.data?.isComplete || statusQuery.isError
-    if (shouldClear) {
+    if (statusQuery.data?.isComplete) {
       clearRunId(userId)
       setStoredRunId(null)
     }
-  }, [statusQuery.data?.isComplete, statusQuery.isError, userId, storedRunId])
+  }, [statusQuery.data?.isComplete, userId, storedRunId])
 
   return {
     accessQuery,
     runMutation,
     statusQuery,
+    hasActiveRun: !!activeRunId,
   }
 }

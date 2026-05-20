@@ -92,7 +92,7 @@ export function HomePage() {
     deleteGroupMutation,
   } = useTopicGroups(user?.id)
   const { accountsQuery } = useSocialAccounts(user?.id)
-  const { accessQuery, runMutation, statusQuery } = useUserSocialJobs(user?.id)
+  const { accessQuery, runMutation, statusQuery, hasActiveRun } = useUserSocialJobs(user?.id)
   const { analysesQuery } = useExploreAnalyses(user?.id)
 
   const topics = useMemo(() => topicsQuery.data ?? [], [topicsQuery.data])
@@ -143,15 +143,10 @@ export function HomePage() {
       void removeGroupMutation.mutateAsync({ topicId, groupId })
     },
   }
-  const isJobRunning = Boolean(statusQuery.data && !statusQuery.data.isComplete)
-  const hasCooldown = Boolean(
-    accessQuery.data?.cooldownEndsAt &&
-    new Date(accessQuery.data.cooldownEndsAt).getTime() > Date.now(),
-  )
+  const isJobRunning = hasActiveRun && !statusQuery.data?.isComplete
   const isProcessing = runMutation.isPending || isJobRunning
   const canRunSocialJob =
     (accessQuery.data?.hasConnectedSocialAccount ?? false) &&
-    !hasCooldown &&
     !isProcessing
   const connectedAccountsCount = accountsQuery.data?.filter((account) => account.isConnected).length ?? 0
   const shouldShowSocialShortcut =
@@ -266,8 +261,7 @@ export function HomePage() {
             <GenerateTopicsButton
               canRun={canRunSocialJob}
               isProcessing={isProcessing}
-              hasCooldown={hasCooldown}
-              cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
+              isStatusError={statusQuery.isError}
               status={statusQuery.data}
               onRun={() => runMutation.mutate()}
             />

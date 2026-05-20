@@ -1,26 +1,60 @@
 import { Loader2, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from '../../../components/ui'
-import type { UserSocialJobsStatus } from '../../../shared/types/account-types'
+import { Button, Popover, PopoverAnchor, PopoverContent } from '../../../components/ui'
+import type { UserSocialJobProgress, UserSocialJobsStatus } from '../../../shared/types/account-types'
 
 interface GenerateTopicsButtonProps {
   canRun: boolean
   isProcessing: boolean
-  hasCooldown: boolean
-  cooldownEndsAt: string | null
+  isStatusError?: boolean
   status?: UserSocialJobsStatus
   onRun: () => void
 }
 
-function formatTimeRemaining(endsAt: string | null, now: number): string | null {
-  if (!endsAt) return null
-  const remaining = new Date(endsAt).getTime() - now
-  if (remaining <= 0) return null
-  const hours = Math.floor(remaining / (1000 * 60 * 60))
-  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))
-  if (hours > 0) return `${hours}h ${minutes}min`
-  return `${minutes}min`
+const JOB_STATUS_LABEL: Record<string, string> = {
+  pending: 'Na fila',
+  running: 'Em andamento',
+  completed: 'Concluído',
+  failed: 'Falhou',
+  rate_limited: 'Rate limit',
+}
+
+function JobStatusBadge({ status }: { status: string }) {
+  const isRunning = status === 'running'
+  const isFailed = status === 'failed'
+  const isCompleted = status === 'completed'
+
+  const className = isRunning
+    ? 'bg-blue-50 text-blue-600'
+    : isFailed
+      ? 'bg-red-50 text-red-600'
+      : isCompleted
+        ? 'bg-[#edf7f1] text-[#1d9a52]'
+        : 'bg-[#f4f4f2] text-[#666]'
+
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${className}`}>
+      {JOB_STATUS_LABEL[status] ?? status}
+    </span>
+  )
+}
+
+function JobProgressCard({ job }: { job: UserSocialJobProgress }) {
+  return (
+    <div className="rounded-[14px] border border-black/10 bg-[#fafaf9] px-3 py-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold capitalize text-[#181818]">{job.provider}</p>
+        <JobStatusBadge status={job.status} />
+      </div>
+      <p className="mt-1.5 text-[10px] leading-4 text-[#666]">
+        {job.postsRead} lidos · {job.newPosts} novos · {job.pagesFetched} páginas
+      </p>
+      {job.lastError && (
+        <p className="mt-1 text-[10px] text-red-600">{job.lastError}</p>
+      )}
+    </div>
+  )
 }
 
 function StatCard({
@@ -48,12 +82,21 @@ function StatCard({
   )
 }
 
-function ProcessingContent({ status }: { status?: UserSocialJobsStatus }) {
+function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsStatus; isStatusError?: boolean }) {
   if (!status) {
     return (
       <div>
         <h3 className="font-heading text-base font-semibold text-[#181818]">Gerando tópicos</h3>
-        <p className="mt-1 text-xs leading-5 text-[#666]">Aguardando informações do processamento.</p>
+        <p className="mt-1 text-xs leading-5 text-[#666]">
+          {isStatusError
+            ? 'Reconectando ao servidor...'
+            : 'Aguardando informações do processamento.'}
+        </p>
+        {isStatusError && (
+          <p className="mt-2 rounded-[10px] border border-amber-100 bg-amber-50 px-2.5 py-2 text-[10px] leading-4 text-amber-700">
+            O servidor pode estar reiniciando. O job continua em execução e os status serão atualizados em breve.
+          </p>
+        )}
       </div>
     )
   }
@@ -62,8 +105,17 @@ function ProcessingContent({ status }: { status?: UserSocialJobsStatus }) {
     <div>
       <div className="mb-4">
         <h3 className="font-heading text-base font-semibold text-[#181818]">Gerando tópicos</h3>
-        <p className="mt-1 text-xs leading-5 text-[#666]">Atualiza automaticamente.</p>
+        <p className="mt-1 text-xs leading-5 text-[#666]">Atualiza a cada 3s automaticamente.</p>
       </div>
+
+      {status.jobs.length > 0 && (
+        <div className="mb-4 space-y-2">
+          {status.jobs.map(job => (
+            <JobProgressCard key={job.id} job={job} />
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-2">
         <StatCard label="Enfileirados" value={status.enqueuedJobs} />
         <StatCard label="Processados" value={status.processedJobs} />
@@ -75,6 +127,7 @@ function ProcessingContent({ status }: { status?: UserSocialJobsStatus }) {
           </div>
         )}
       </div>
+
       {status.errorMessage && (
         <p className="mt-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2.5 text-xs text-red-600">
           {status.errorMessage}
@@ -84,41 +137,15 @@ function ProcessingContent({ status }: { status?: UserSocialJobsStatus }) {
   )
 }
 
-function CooldownContent({ cooldownEndsAt }: { cooldownEndsAt: string | null }) {
-  const [now, setNow] = useState(() => Date.now())
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 30_000)
-    return () => clearInterval(id)
-  }, [])
-
-  const timeRemaining = formatTimeRemaining(cooldownEndsAt, now)
-
-  return (
-    <div>
-      <h3 className="font-heading text-base font-semibold text-[#181818]">Próxima execução</h3>
-      <p className="mt-1 text-xs leading-5 text-[#666]">
-        {timeRemaining ? (
-          <>Disponível em <span className="font-semibold text-[#181818]">{timeRemaining}</span>.</>
-        ) : (
-          'Disponível em breve.'
-        )}
-      </p>
-    </div>
-  )
-}
-
 export function GenerateTopicsButton({
   canRun,
   isProcessing,
-  hasCooldown,
-  cooldownEndsAt,
+  isStatusError,
   status,
   onRun,
 }: GenerateTopicsButtonProps) {
   const [open, setOpen] = useState(false)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const hasContent = isProcessing || hasCooldown
 
   function cancelClose() {
     if (closeTimerRef.current) {
@@ -129,7 +156,7 @@ export function GenerateTopicsButton({
 
   function handleMouseEnter() {
     cancelClose()
-    if (hasContent) setOpen(true)
+    if (isProcessing) setOpen(true)
   }
 
   function handleMouseLeave() {
@@ -143,35 +170,41 @@ export function GenerateTopicsButton({
   }, [])
 
   return (
-    <Popover open={open && hasContent} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="secondary"
-          size="sm"
-          className="my-auto rounded-full"
-          icon={
-            isProcessing
-              ? <Loader2 className="h-4 w-4 animate-spin" />
-              : <Sparkles className="h-4 w-4" />
-          }
-          disabled={!canRun}
-          onClick={canRun ? onRun : undefined}
+    <Popover open={open && isProcessing} onOpenChange={setOpen}>
+      {/*
+        PopoverAnchor wraps the button div so hover events fire even when
+        the button is disabled (disabled elements suppress mouse events).
+      */}
+      <PopoverAnchor asChild>
+        <div
+          className="inline-flex"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {isProcessing ? <span className="animate-pulse">Processando</span> : 'Gerar tópicos'}
-        </Button>
-      </PopoverTrigger>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="my-auto rounded-full"
+            icon={
+              isProcessing
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <Sparkles className="h-4 w-4" />
+            }
+            disabled={!canRun}
+            onClick={canRun ? onRun : undefined}
+          >
+            {isProcessing ? <span className="animate-pulse">Processando</span> : 'Gerar tópicos'}
+          </Button>
+        </div>
+      </PopoverAnchor>
       <PopoverContent
         align="center"
         side="bottom"
-        className="w-[280px]"
+        className="w-[300px]"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {isProcessing
-          ? <ProcessingContent status={status} />
-          : <CooldownContent cooldownEndsAt={cooldownEndsAt} />}
+        <ProcessingContent status={status} isStatusError={isStatusError} />
       </PopoverContent>
     </Popover>
   )
