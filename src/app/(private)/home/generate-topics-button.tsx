@@ -8,6 +8,7 @@ interface GenerateTopicsButtonProps {
   canRun: boolean
   isProcessing: boolean
   isStatusError?: boolean
+  cooldownEndsAt?: string | null
   status?: UserSocialJobsStatus
   onRun: () => void
 }
@@ -18,6 +19,17 @@ const JOB_STATUS_LABEL: Record<string, string> = {
   completed: 'Concluído',
   failed: 'Falhou',
   rate_limited: 'Rate limit',
+}
+
+function formatCooldownRemaining(endsAt: string): string {
+  const ms = new Date(endsAt).getTime() - Date.now()
+  if (ms <= 0) return ''
+  const totalMinutes = Math.ceil(ms / 60_000)
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  if (hours > 0 && minutes > 0) return `${hours}h ${minutes}min`
+  if (hours > 0) return `${hours}h`
+  return `${minutes}min`
 }
 
 function JobStatusBadge({ status }: { status: string }) {
@@ -105,7 +117,6 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
     <div>
       <div className="mb-4">
         <h3 className="font-heading text-base font-semibold text-[#181818]">Gerando tópicos</h3>
-        <p className="mt-1 text-xs leading-5 text-[#666]">Atualiza a cada 3s automaticamente.</p>
       </div>
 
       {status.jobs.length > 0 && (
@@ -117,10 +128,6 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
       )}
 
       <div className="grid grid-cols-2 gap-2">
-        <StatCard label="Enfileirados" value={status.enqueuedJobs} />
-        <StatCard label="Processados" value={status.processedJobs} />
-        <StatCard label="Concluídos" value={status.completedJobs} variant="success" />
-        <StatCard label="Tópicos" value={status.generatedTopics} />
         {status.failedJobs > 0 && (
           <div className="col-span-2">
             <StatCard label="Com erro" value={status.failedJobs} variant="error" />
@@ -137,15 +144,87 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
   )
 }
 
+function CompletedContent({ cooldownEndsAt, status }: { cooldownEndsAt: string; status?: UserSocialJobsStatus }) {
+  const [remaining, setRemaining] = useState(() => formatCooldownRemaining(cooldownEndsAt))
+
+  useEffect(() => {
+    const update = () => setRemaining(formatCooldownRemaining(cooldownEndsAt))
+    const id = setInterval(update, 30_000)
+    return () => clearInterval(id)
+  }, [cooldownEndsAt])
+
+  return (
+    <div>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className="font-heading text-base font-semibold text-[#181818]">Última execução</h3>
+        {remaining && (
+          <span className="shrink-0 rounded-full bg-[#f4f4f2] px-2 py-0.5 text-[10px] font-semibold text-[#666]">
+            {remaining} restantes
+          </span>
+        )}
+      </div>
+
+      {status ? (
+        <>
+          {status.jobs.length > 0 && (
+            <div className="mb-3 space-y-2">
+              {status.jobs.map(job => (
+                <JobProgressCard key={job.id} job={job} />
+              ))}
+            </div>
+          )}
+
+          {status.generatedTopics > 0 && (
+            <p className="text-[11px] font-semibold text-[#1d9a52]">
+              {status.generatedTopics} {status.generatedTopics === 1 ? 'tópico gerado' : 'tópicos gerados'}
+            </p>
+          )}
+
+          {status.failedJobs > 0 && (
+            <p className="mt-1 text-[11px] text-red-600">
+              {status.failedJobs} {status.failedJobs === 1 ? 'job falhou' : 'jobs falharam'}
+            </p>
+          )}
+
+          {status.errorMessage && (
+            <p className="mt-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600">
+              {status.errorMessage}
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="text-xs text-[#666]">Execute novamente para ver os resultados aqui.</p>
+      )}
+    </div>
+  )
+}
+
 export function GenerateTopicsButton({
   canRun,
   isProcessing,
   isStatusError,
+  cooldownEndsAt,
   status,
   onRun,
 }: GenerateTopicsButtonProps) {
   const [open, setOpen] = useState(false)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [isInCooldown, setIsInCooldown] = useState(() =>
+    !!cooldownEndsAt && new Date(cooldownEndsAt) > new Date()
+  )
+
+  useEffect(() => {
+    if (!cooldownEndsAt) {
+      setIsInCooldown(false)
+      return
+    }
+    const check = () => setIsInCooldown(new Date(cooldownEndsAt) > new Date())
+    check()
+    const id = setInterval(check, 30_000)
+    return () => clearInterval(id)
+  }, [cooldownEndsAt])
+
+  const hasTooltip = isProcessing || isInCooldown
 
   function cancelClose() {
     if (closeTimerRef.current) {
@@ -156,7 +235,7 @@ export function GenerateTopicsButton({
 
   function handleMouseEnter() {
     cancelClose()
-    if (isProcessing) setOpen(true)
+    if (hasTooltip) setOpen(true)
   }
 
   function handleMouseLeave() {
@@ -170,7 +249,7 @@ export function GenerateTopicsButton({
   }, [])
 
   return (
-    <Popover open={open && isProcessing} onOpenChange={setOpen}>
+    <Popover open={open && hasTooltip} onOpenChange={setOpen}>
       {/*
         PopoverAnchor wraps the button div so hover events fire even when
         the button is disabled (disabled elements suppress mouse events).
@@ -204,7 +283,10 @@ export function GenerateTopicsButton({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <ProcessingContent status={status} isStatusError={isStatusError} />
+        {isProcessing || !cooldownEndsAt
+          ? <ProcessingContent status={status} isStatusError={isStatusError} />
+          : <CompletedContent cooldownEndsAt={cooldownEndsAt} status={status} />
+        }
       </PopoverContent>
     </Popover>
   )

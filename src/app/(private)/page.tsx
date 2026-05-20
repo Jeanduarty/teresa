@@ -262,6 +262,7 @@ export function HomePage() {
               canRun={canRunSocialJob}
               isProcessing={isProcessing}
               isStatusError={statusQuery.isError}
+              cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
               status={statusQuery.data}
               onRun={() => runMutation.mutate()}
             />
