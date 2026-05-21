@@ -2,6 +2,18 @@ import { clearAuthToken, readAuthToken } from './auth-token-storage'
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3333'
 
+export class ApiRequestError extends Error {
+  statusCode: number
+  payload: unknown
+
+  constructor(message: string, statusCode: number, payload: unknown) {
+    super(message)
+    this.name = 'ApiRequestError'
+    this.statusCode = statusCode
+    this.payload = payload
+  }
+}
+
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown
   auth?: boolean
@@ -27,6 +39,28 @@ function isApiSuccessResponse<TResponse>(payload: unknown): payload is ApiSucces
   )
 }
 
+function getErrorMessage(payload: unknown): string {
+  if (
+    typeof payload === 'object' &&
+    payload !== null &&
+    'message' in payload &&
+    typeof (payload as { message: unknown }).message === 'string'
+  ) {
+    return (payload as { message: string }).message
+  }
+
+  return 'Erro ao comunicar com o servidor'
+}
+
+async function throwApiError(response: Response): Promise<never> {
+  if (response.status === 401) {
+    clearAuthToken()
+  }
+
+  const errorPayload = await response.json().catch(() => null)
+  throw new ApiRequestError(getErrorMessage(errorPayload), response.status, errorPayload)
+}
+
 export async function apiRequest<TResponse>(
   path: string,
   { body, auth = true, headers, ...options }: RequestOptions = {},
@@ -43,12 +77,7 @@ export async function apiRequest<TResponse>(
   })
 
   if (!response.ok) {
-    if (response.status === 401) {
-      clearAuthToken()
-    }
-
-    const errorPayload = await response.json().catch(() => null)
-    throw new Error(errorPayload?.message ?? 'Erro ao comunicar com o servidor')
+    await throwApiError(response)
   }
 
   const payload = (await response.json()) as unknown
@@ -75,12 +104,7 @@ export async function apiRawRequest<TResponse>(
   })
 
   if (!response.ok) {
-    if (response.status === 401) {
-      clearAuthToken()
-    }
-
-    const errorPayload = await response.json().catch(() => null)
-    throw new Error(errorPayload?.message ?? 'Erro ao comunicar com o servidor')
+    await throwApiError(response)
   }
 
   const payload = (await response.json()) as unknown
@@ -106,12 +130,7 @@ export async function apiBlobRequest(
   })
 
   if (!response.ok) {
-    if (response.status === 401) {
-      clearAuthToken()
-    }
-
-    const errorPayload = await response.json().catch(() => null)
-    throw new Error(errorPayload?.message ?? 'Erro ao comunicar com o servidor')
+    await throwApiError(response)
   }
 
   return response.blob()

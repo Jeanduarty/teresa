@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { userSocialJobsService } from '../services/user-social-jobs-service'
+import { ApiRequestError } from '../shared/lib/api-client'
 import type { UserSocialJobsAccess } from '../shared/types/account-types'
 
 function getStorageKey(userId: string) {
@@ -19,21 +20,22 @@ function readStoredRunId(userId: string): string | null {
 function saveRunId(userId: string, runId: string): void {
   try {
     sessionStorage.setItem(getStorageKey(userId), runId)
-  } catch {}
+  } catch {
+    return
+  }
 }
 
 function clearRunId(userId: string): void {
   try {
     sessionStorage.removeItem(getStorageKey(userId))
-  } catch {}
+  } catch {
+    return
+  }
 }
 
 export function useUserSocialJobs(userId?: string) {
   const queryClient = useQueryClient()
-
-  const [storedRunId, setStoredRunId] = useState<string | null>(() =>
-    userId ? readStoredRunId(userId) : null,
-  )
+  const activeRunId = userId ? readStoredRunId(userId) : null
 
   const accessQuery = useQuery({
     queryKey: ['user-social-jobs', 'access', userId],
@@ -60,16 +62,25 @@ export function useUserSocialJobs(userId?: string) {
     },
   })
 
-  const activeRunId = runMutation.data?.runId ?? storedRunId
-
   const statusQuery = useQuery({
     queryKey: ['user-social-jobs', 'status', userId, activeRunId],
     queryFn: async () => {
       if (!activeRunId) throw new Error('No runId')
-      return userSocialJobsService.getUserSocialJobsStatus(activeRunId)
+      try {
+        return await userSocialJobsService.getUserSocialJobsStatus(activeRunId)
+      } catch (error) {
+        if (userId && error instanceof ApiRequestError && error.statusCode === 404) {
+          clearRunId(userId)
+        }
+
+        throw error
+      }
     },
     enabled: !!activeRunId && !!userId,
-    retry: 3,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiRequestError && error.statusCode === 404) return false
+      return failureCount < 3
+    },
     retryDelay: (attempt) => Math.min(2000 * 2 ** attempt, 15_000),
     refetchInterval: (query) => {
       if (query.state.data?.isComplete) return false
@@ -79,12 +90,11 @@ export function useUserSocialJobs(userId?: string) {
   })
 
   useEffect(() => {
-    if (!userId || !storedRunId) return
+    if (!userId || !activeRunId) return
     if (statusQuery.data?.isComplete) {
       clearRunId(userId)
-      setStoredRunId(null)
     }
-  }, [statusQuery.data?.isComplete, userId, storedRunId])
+  }, [activeRunId, statusQuery.data?.isComplete, userId])
 
   return {
     accessQuery,

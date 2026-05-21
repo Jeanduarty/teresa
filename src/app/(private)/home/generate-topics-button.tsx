@@ -130,7 +130,7 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
         </p>
         {isStatusError && (
           <p className="mt-2 rounded-[10px] border border-amber-100 bg-amber-50 px-2.5 py-2 text-[10px] leading-4 text-amber-700">
-            O servidor pode estar reiniciando. O job continua em execução e os status serão atualizados em breve.
+            Não foi possível confirmar o status agora. Assim que o servidor responder, o estado será atualizado.
           </p>
         )}
       </div>
@@ -247,21 +247,17 @@ export function GenerateTopicsButton({
 }: GenerateTopicsButtonProps) {
   const [open, setOpen] = useState(false)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const [isInCooldown, setIsInCooldown] = useState(() =>
-    !!cooldownEndsAt && new Date(cooldownEndsAt) > new Date()
-  )
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
     if (!cooldownEndsAt) {
-      setIsInCooldown(false)
       return
     }
-    const check = () => setIsInCooldown(new Date(cooldownEndsAt) > new Date())
-    check()
-    const id = setInterval(check, 30_000)
+    const id = setInterval(() => setNow(Date.now()), 30_000)
     return () => clearInterval(id)
   }, [cooldownEndsAt])
 
+  const isInCooldown = !!cooldownEndsAt && new Date(cooldownEndsAt).getTime() > now
   const hasTooltip = isProcessing || isInCooldown
 
   function cancelClose() {
