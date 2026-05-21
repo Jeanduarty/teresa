@@ -96,16 +96,16 @@ function StatCard({
 
 const PHASE_LABEL: Record<string, string> = {
   collecting: 'Buscando posts curtidos...',
-  transcribing: 'Transcrevendo vídeos...',
+  analyzing: 'Analisando vídeos (multimodal)...',
   generating_topics: 'Gerando tópicos com IA...',
 }
 
-function TranscriptionProgress({ done, total }: { done: number; total: number }) {
+function AnalysisProgress({ done, total }: { done: number; total: number }) {
   const pct = total > 0 ? Math.round((done / total) * 100) : 0
   return (
     <div className="mt-3">
       <div className="mb-1 flex items-center justify-between text-[10px] text-[#666]">
-        <span>{done} de {total} vídeos transcritos</span>
+        <span>{done} de {total} vídeos analisados</span>
         <span>{pct}%</span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#ebebeb]">
@@ -138,7 +138,7 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
   }
 
   const phaseLabel = status.phase ? PHASE_LABEL[status.phase] : 'Processando...'
-  const isTranscribing = status.phase === 'transcribing'
+  const isAnalyzing = status.phase === 'analyzing'
 
   return (
     <div>
@@ -153,8 +153,8 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
         )}
       </div>
 
-      {isTranscribing && status.totalVideosToTranscribe > 0 && (
-        <TranscriptionProgress done={status.transcribedVideos} total={status.totalVideosToTranscribe} />
+      {isAnalyzing && status.totalVideosToAnalyze > 0 && (
+        <AnalysisProgress done={status.analyzedVideos} total={status.totalVideosToAnalyze} />
       )}
 
       {status.jobs.length > 0 && (

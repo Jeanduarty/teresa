@@ -93,8 +93,11 @@ export function useUserSocialJobs(userId?: string) {
     if (!userId || !activeRunId) return
     if (statusQuery.data?.isComplete) {
       clearRunId(userId)
+      void queryClient.invalidateQueries({ queryKey: ['content-topics'] })
+      void queryClient.invalidateQueries({ queryKey: ['social-accounts', userId] })
+      void queryClient.invalidateQueries({ queryKey: ['user-social-jobs', 'access', userId] })
     }
-  }, [activeRunId, statusQuery.data?.isComplete, userId])
+  }, [activeRunId, statusQuery.data?.isComplete, userId, queryClient])
 
   return {
     accessQuery,

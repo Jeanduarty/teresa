@@ -180,10 +180,10 @@ export interface UserSocialJobsStatus {
   isComplete: boolean
   errorMessage: string | null
   jobs: UserSocialJobProgress[]
-  phase: 'collecting' | 'transcribing' | 'generating_topics' | null
+  phase: 'collecting' | 'analyzing' | 'generating_topics' | null
   postsCollected: number
-  transcribedVideos: number
-  totalVideosToTranscribe: number
+  analyzedVideos: number
+  totalVideosToAnalyze: number
 }
 
 export interface RevokeSessionResult {
