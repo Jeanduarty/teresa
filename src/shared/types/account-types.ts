@@ -111,7 +111,7 @@ export interface DevelopmentAccess {
 export interface DevelopmentSocialJobsResult {
   runId: string
   startedAt: string
-  cooldownEndsAt: string
+  cooldownEndsAt: string | null
   skipped: boolean
   jobIds: string[]
   enqueuedJobs: number
@@ -122,7 +122,7 @@ export interface DevelopmentSocialJobsResult {
 export interface DevelopmentSocialJobsStatus {
   runId: string
   startedAt: string
-  cooldownEndsAt: string
+  cooldownEndsAt: string | null
   jobIds: string[]
   enqueuedJobs: number
   processedJobs: number
@@ -145,7 +145,7 @@ export interface UserSocialJobsAccess {
 export interface UserSocialJobsResult {
   runId: string
   startedAt: string
-  cooldownEndsAt: string
+  cooldownEndsAt: string | null
   jobIds: string[]
   enqueuedJobs: number
   processedJobs: number
@@ -166,7 +166,7 @@ export interface UserSocialJobProgress {
 export interface UserSocialJobsStatus {
   runId: string
   startedAt: string
-  cooldownEndsAt: string
+  cooldownEndsAt: string | null
   jobIds: string[]
   enqueuedJobs: number
   processedJobs: number
