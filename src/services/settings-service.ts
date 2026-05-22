@@ -110,12 +110,15 @@ export const settingsService = {
     return result
   },
 
-  async getDevelopmentSocialJobsStatus(runId: string): Promise<DevelopmentSocialJobsStatus> {
-    const params = new URLSearchParams({
-      runId,
-    })
+  async getDevelopmentSocialJobsStatus(runId?: string): Promise<DevelopmentSocialJobsStatus> {
+    const params = new URLSearchParams()
+
+    if (runId) {
+      params.set('runId', runId)
+    }
+
     const { status } = await apiRequest<{ status: DevelopmentSocialJobsStatus }>(
-      `/settings/development/social-jobs/status?${params.toString()}`,
+      `/settings/development/social-jobs/status${params.toString() ? `?${params.toString()}` : ''}`,
     )
 
     return status

@@ -19,8 +19,16 @@ export const userSocialJobsService = {
     })
   },
 
-  getUserSocialJobsStatus(runId: string): Promise<UserSocialJobsStatus> {
-    return apiRequest(`/topics/social-jobs/status?runId=${runId}`, {
+  getUserSocialJobsStatus(runId?: string): Promise<UserSocialJobsStatus> {
+    const params = new URLSearchParams()
+
+    if (runId) {
+      params.set('runId', runId)
+    }
+
+    const suffix = params.toString()
+
+    return apiRequest(`/topics/social-jobs/status${suffix ? `?${suffix}` : ''}`, {
       method: 'GET',
     })
   },

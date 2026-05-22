@@ -1,6 +1,8 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 
 import type { AccountSectionId } from '../app/(private)/settings/account-settings-types'
+import { settingsService } from '../services/settings-service'
+import { ApiRequestError } from '../shared/lib/api-client'
 import { queryClient } from '../shared/lib/query-client'
 import { clearAuthToken } from '../shared/lib/auth-token-storage'
 import { clearUser } from '../store/slices/auth-session-slice'
@@ -15,7 +17,6 @@ import type {
   UserSessionPage,
 } from '../shared/types/account-types'
 import { useProfile } from './use-profile'
-import { settingsService } from '../services/settings-service'
 
 interface UseAccountSettingsParams {
   slug: string
@@ -171,30 +172,25 @@ export function useAccountSettings({
               }
             : currentAccess,
       )
+
+      void queryClient.invalidateQueries({
+        queryKey: ['settings', 'development', 'social-jobs-status', userId],
+      })
     },
   })
+
   const developmentSocialJobsStatusQuery = useQuery<DevelopmentSocialJobsStatus, Error>({
-    queryKey: [
-      'settings',
-      'development',
-      'social-jobs-status',
-      userId,
-      runDevelopmentSocialJobsMutation.data?.runId,
-    ],
-    queryFn: () => {
-      const runId = runDevelopmentSocialJobsMutation.data?.runId
-
-      if (!runId) {
-        throw new Error('ID da execução dos jobs é obrigatório')
-      }
-
-      return settingsService.getDevelopmentSocialJobsStatus(runId)
+    queryKey: ['settings', 'development', 'social-jobs-status', userId],
+    queryFn: () => settingsService.getDevelopmentSocialJobsStatus(),
+    enabled: Boolean(userId),
+    retry: (failureCount, error) => {
+      if (error instanceof ApiRequestError && error.statusCode === 404) return false
+      return failureCount < 3
     },
-    enabled: Boolean(userId && runDevelopmentSocialJobsMutation.data?.runId),
     refetchInterval: (query) => {
       const status = query.state.data
 
-      return status?.isComplete ? false : 3_000
+      return !status || status.isComplete ? false : 3_000
     },
   })
 
