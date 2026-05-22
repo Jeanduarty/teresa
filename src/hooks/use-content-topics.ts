@@ -7,6 +7,8 @@ import type {
   ContentTopicFilters,
   ContentTopicGroup,
   ContentTopicMetrics,
+  ScriptType,
+  ScriptView,
   UpdateContentTopicInput,
 } from '../shared/types/account-types'
 
@@ -341,10 +343,42 @@ export function useContentTopicDetail({ userId, topicId }: { userId?: string; to
     },
   })
 
+  const updateFieldScriptMutation = useMutation<
+    ContentTopic,
+    Error,
+    { scriptType: ScriptType; view: ScriptView; script: string }
+  >({
+    mutationFn: ({ scriptType, view, script }) => {
+      if (!userId || !topicId) throw new Error('ID do usuário e ID do topico são obrigatórios')
+      return contentTopicsService.updateFieldScript({ userId, topicId, scriptType, view, script })
+    },
+    onSuccess: (updatedTopic) => {
+      queryClient.setQueryData<ContentTopic>(['content-topics', userId, topicId], updatedTopic)
+      updateTopicInCachedLists(userId, updatedTopic)
+    },
+  })
+
+  const refineScriptMutation = useMutation<
+    ContentTopic,
+    Error,
+    { scriptType: ScriptType; userPrompt: string }
+  >({
+    mutationFn: ({ scriptType, userPrompt }) => {
+      if (!userId || !topicId) throw new Error('ID do usuário e ID do topico são obrigatórios')
+      return contentTopicsService.refineScript({ userId, topicId, scriptType, userPrompt })
+    },
+    onSuccess: (updatedTopic) => {
+      queryClient.setQueryData<ContentTopic>(['content-topics', userId, topicId], updatedTopic)
+      updateTopicInCachedLists(userId, updatedTopic)
+    },
+  })
+
   return {
     topicQuery,
     updateTopicMutation,
     updateScriptMutation,
+    updateFieldScriptMutation,
+    refineScriptMutation,
     resetScriptMutation,
     markDoneMutation,
     markPendingMutation,

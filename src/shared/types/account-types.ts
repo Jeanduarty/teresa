@@ -210,6 +210,9 @@ export interface SocialAccount {
   webHandle: string | null
 }
 
+export type ScriptType = 'strategic' | 'simplified'
+export type ScriptView = 'original' | 'refined'
+
 export interface ContentTopic {
   id: string
   userId: string
@@ -218,6 +221,10 @@ export interface ContentTopic {
   summary: string
   originalScript: string
   currentScript: string
+  strategicScript: string
+  simplifiedScript: string
+  strategicRefined: string | null
+  simplifiedRefined: string | null
   editedAt: string | null
   sourceProvider: SocialProvider
   status: ContentTopicStatus

@@ -5,6 +5,8 @@ import type {
   ContentTopicGroup,
   ContentTopicMetrics,
   LinkPreview,
+  ScriptType,
+  ScriptView,
   UpdateContentTopicInput,
 } from '../shared/types/account-types'
 
@@ -144,9 +146,43 @@ export const contentTopicsService = {
   async resetScript({ topicId }: { userId: string; topicId: string }): Promise<ContentTopic> {
     const { topic } = await apiRequest<{ topic: ContentTopic }>(
       `/topics/${topicId}/script/reset`,
-      {
-        method: 'POST',
-      },
+      { method: 'POST' },
+    )
+    return topic
+  },
+
+  async updateFieldScript({
+    topicId,
+    scriptType,
+    view,
+    script,
+  }: {
+    userId: string
+    topicId: string
+    scriptType: ScriptType
+    view: ScriptView
+    script: string
+  }): Promise<ContentTopic> {
+    const { topic } = await apiRequest<{ topic: ContentTopic }>(`/topics/${topicId}/script`, {
+      method: 'PATCH',
+      body: { script, scriptType, view },
+    })
+    return topic
+  },
+
+  async refineScript({
+    topicId,
+    scriptType,
+    userPrompt,
+  }: {
+    userId: string
+    topicId: string
+    scriptType: ScriptType
+    userPrompt: string
+  }): Promise<ContentTopic> {
+    const { topic } = await apiRequest<{ topic: ContentTopic }>(
+      `/topics/${topicId}/script/refine`,
+      { method: 'POST', body: { scriptType, userPrompt } },
     )
     return topic
   },

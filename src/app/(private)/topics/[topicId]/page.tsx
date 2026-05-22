@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '../../../../components/ui'
 import { useAuthSession } from '../../../../hooks/use-auth'
 import { useContentTopicDetail, useTopicGroups } from '../../../../hooks/use-content-topics'
+import type { ScriptType, ScriptView } from '../../../../shared/types/account-types'
 import { TopicEditFieldDialog, type EditFieldState } from './topic-edit-field-dialog'
 import { TopicGroupsCard } from './topic-groups-card'
 import { TopicOverview } from './topic-overview'
@@ -36,8 +37,8 @@ export function TopicDetailsPage() {
   const {
     topicQuery,
     updateTopicMutation,
-    updateScriptMutation,
-    resetScriptMutation,
+    updateFieldScriptMutation,
+    refineScriptMutation,
     markDoneMutation,
     markPendingMutation,
     addGroupMutation,
@@ -51,16 +52,17 @@ export function TopicDetailsPage() {
   const topic = topicQuery.data
   const groups = groupsQuery.data ?? []
 
-  async function handleSaveScript(script: string): Promise<void> {
-    if (!script) {
-      return
-    }
-
-    await updateScriptMutation.mutateAsync(script)
+  async function handleSaveFieldScript(
+    scriptType: ScriptType,
+    view: ScriptView,
+    script: string,
+  ): Promise<void> {
+    if (!script) return
+    await updateFieldScriptMutation.mutateAsync({ scriptType, view, script })
   }
 
-  async function handleResetScript(): Promise<void> {
-    await resetScriptMutation.mutateAsync()
+  async function handleRefineScript(scriptType: ScriptType, userPrompt: string): Promise<void> {
+    await refineScriptMutation.mutateAsync({ scriptType, userPrompt })
   }
 
   async function handleDeleteTopic(): Promise<void> {
@@ -101,12 +103,26 @@ export function TopicDetailsPage() {
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <TopicScriptEditor
-              key={`${topic.id}-${topic.currentScript}`}
+              key={topic.id}
               topic={topic}
-              isSaving={updateScriptMutation.isPending}
-              isResetting={resetScriptMutation.isPending}
-              onSave={handleSaveScript}
-              onReset={handleResetScript}
+              isSavingStrategic={
+                updateFieldScriptMutation.isPending &&
+                updateFieldScriptMutation.variables?.scriptType === 'strategic'
+              }
+              isSavingSimplified={
+                updateFieldScriptMutation.isPending &&
+                updateFieldScriptMutation.variables?.scriptType === 'simplified'
+              }
+              isRefiningStrategic={
+                refineScriptMutation.isPending &&
+                refineScriptMutation.variables?.scriptType === 'strategic'
+              }
+              isRefiningSimplified={
+                refineScriptMutation.isPending &&
+                refineScriptMutation.variables?.scriptType === 'simplified'
+              }
+              onSave={handleSaveFieldScript}
+              onRefine={handleRefineScript}
             />
 
             <aside className="space-y-4">
