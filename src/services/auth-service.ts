@@ -3,7 +3,13 @@ import { apiRequest } from '../shared/lib/api-client'
 import type {
   AuthUser,
   LoginInput,
+  MutationMessage,
+  RequestPasswordResetInput,
+  RequestPasswordResetResponse,
+  ResetPasswordInput,
   SignupInput,
+  VerifyPasswordResetCodeInput,
+  VerifyPasswordResetCodeResponse,
   VerifySignupSecretInput,
 } from '../shared/types/account-types'
 
@@ -52,6 +58,30 @@ export const authService = {
     })
 
     return response.success
+  },
+
+  async requestPasswordReset(input: RequestPasswordResetInput): Promise<RequestPasswordResetResponse> {
+    return apiRequest<RequestPasswordResetResponse>('/auth/password-reset/request', {
+      method: 'POST',
+      auth: false,
+      body: input,
+    })
+  },
+
+  async verifyPasswordResetCode(input: VerifyPasswordResetCodeInput): Promise<VerifyPasswordResetCodeResponse> {
+    return apiRequest<VerifyPasswordResetCodeResponse>('/auth/password-reset/verify', {
+      method: 'POST',
+      auth: false,
+      body: input,
+    })
+  },
+
+  async resetPassword(input: ResetPasswordInput): Promise<MutationMessage> {
+    return apiRequest<MutationMessage>('/auth/password-reset', {
+      method: 'POST',
+      auth: false,
+      body: input,
+    })
   },
 
   async logout(): Promise<boolean> {

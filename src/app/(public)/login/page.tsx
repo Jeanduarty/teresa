@@ -88,7 +88,7 @@ export function LoginPage() {
             <label htmlFor="login-password" className="font-body text-sm font-semibold leading-6 text-[#666]">
               Senha
             </label>
-            <Link to="/signup" className="font-body text-sm leading-6 text-[#666] hover:underline">
+            <Link to="/forgot" className="font-body text-sm leading-6 text-[#666] hover:underline">
               Esqueceu a senha?
             </Link>
           </div>

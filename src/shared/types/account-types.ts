@@ -71,6 +71,33 @@ export interface VerifySignupSecretInput {
   secretApp: string
 }
 
+export interface RequestPasswordResetInput {
+  identifier: string
+  resend?: boolean
+}
+
+export interface RequestPasswordResetResponse {
+  message: string
+  email: string
+  alreadySent: boolean
+  resendCooldownSeconds: number
+}
+
+export interface VerifyPasswordResetCodeInput {
+  identifier: string
+  code: string
+}
+
+export interface VerifyPasswordResetCodeResponse {
+  message: string
+  resetToken: string
+}
+
+export interface ResetPasswordInput {
+  resetToken: string
+  newPassword: string
+}
+
 export interface UpdateProfileInput {
   userId: string
   userName: string

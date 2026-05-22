@@ -9,6 +9,7 @@ import { ExploreNewAnalysisPage } from './(private)/explore/new/page'
 import { AccountSettingsPage } from './(private)/settings/page'
 import { HomePage } from './(private)/page'
 import { TopicDetailsPage } from './(private)/topics/[topicId]/page'
+import { ForgotPasswordPage } from './(public)/forgot/page'
 import { LoginPage } from './(public)/login/page'
 import { SignupPage } from './(public)/signup/page'
 import { LegalPage } from './novidades/legal/page'
@@ -79,6 +80,14 @@ export function AppRouter() {
           <Route path="/settings/:section" element={<AccountSettingsPage />} />
           <Route path="/topics/:topicId" element={<TopicDetailsPage />} />
         </Route>
+        <Route
+          path="/forgot"
+          element={
+            <AuthOnly>
+              <ForgotPasswordPage />
+            </AuthOnly>
+          }
+        />
         <Route
           path="/login"
           element={

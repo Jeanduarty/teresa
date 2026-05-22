@@ -9,7 +9,13 @@ import { useAppDispatch, useAppSelector } from '../store/hooks'
 import type {
   AuthUser,
   LoginInput,
+  MutationMessage,
+  RequestPasswordResetInput,
+  RequestPasswordResetResponse,
+  ResetPasswordInput,
   SignupInput,
+  VerifyPasswordResetCodeInput,
+  VerifyPasswordResetCodeResponse,
   VerifySignupSecretInput,
 } from '../shared/types/account-types'
 
@@ -66,6 +72,24 @@ export function useSignup() {
 export function useVerifySignupSecret() {
   return useMutation<boolean, Error, VerifySignupSecretInput>({
     mutationFn: authService.verifySignupSecret,
+  })
+}
+
+export function useRequestPasswordReset() {
+  return useMutation<RequestPasswordResetResponse, Error, RequestPasswordResetInput>({
+    mutationFn: authService.requestPasswordReset,
+  })
+}
+
+export function useVerifyPasswordResetCode() {
+  return useMutation<VerifyPasswordResetCodeResponse, Error, VerifyPasswordResetCodeInput>({
+    mutationFn: authService.verifyPasswordResetCode,
+  })
+}
+
+export function useResetPassword() {
+  return useMutation<MutationMessage, Error, ResetPasswordInput>({
+    mutationFn: authService.resetPassword,
   })
 }
 
