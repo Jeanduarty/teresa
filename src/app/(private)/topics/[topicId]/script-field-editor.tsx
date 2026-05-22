@@ -1,7 +1,8 @@
-import { Save, Sparkles, ToggleLeft, ToggleRight } from 'lucide-react'
+import { ExternalLink, Pencil, Save, Sparkles, ToggleLeft, ToggleRight, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { Button } from '../../../../components/ui'
+import { splitTextWithLinks } from '../../../../shared/lib/text-links'
 import type { ContentTopic, ScriptType, ScriptViewMode } from '../../../../shared/types/account-types'
 import { TopicAiRefineDialog } from './topic-ai-refine-dialog'
 
@@ -25,6 +26,30 @@ const DESCRIPTION: Record<ScriptType, string> = {
   simplified: 'Roteiro prático com microcenas prontas para gravar.',
 }
 
+function ScriptReadView({ content }: { content: string }) {
+  const parts = splitTextWithLinks(content)
+  return (
+    <div className="min-h-[440px] w-full break-words rounded-[18px] border border-black/10 bg-[#fbfbfa] px-5 py-4 font-body text-[0.98rem] leading-7 text-[#181818] whitespace-pre-wrap">
+      {parts.map((part, i) =>
+        part.type === 'link' ? (
+          <a
+            key={i}
+            href={part.value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-0.5 text-xs font-medium text-violet-700 transition-colors hover:bg-violet-100"
+          >
+            <ExternalLink className="h-3 w-3" />
+            clique aqui
+          </a>
+        ) : (
+          <span key={i}>{part.value}</span>
+        )
+      )}
+    </div>
+  )
+}
+
 export function ScriptFieldEditor({
   topic,
   scriptType,
@@ -42,6 +67,7 @@ export function ScriptFieldEditor({
     scriptType === 'strategic' ? topic.strategicViewMode : topic.simplifiedViewMode
 
   const [aiDialogOpen, setAiDialogOpen] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   const currentContent = viewMode === 'refined' && refinedContent !== null ? refinedContent : originalContent
   const [draft, setDraft] = useState(currentContent)
@@ -49,6 +75,16 @@ export function ScriptFieldEditor({
 
   const isRefined = refinedContent !== null
   const aiButtonDisabled = isRefined
+
+  function handleStartEdit() {
+    setDraft(currentContent)
+    setIsEditing(true)
+  }
+
+  function handleCancelEdit() {
+    setDraft(currentContent)
+    setIsEditing(false)
+  }
 
   async function handleSwitchChange() {
     const newMode: ScriptViewMode = viewMode === 'refined' ? 'original' : 'refined'
@@ -58,6 +94,11 @@ export function ScriptFieldEditor({
 
   async function handleRefine(userPrompt: string) {
     await onRefine(scriptType, userPrompt)
+  }
+
+  async function handleSave() {
+    await onSave(scriptType, viewMode, draft.trim())
+    setIsEditing(false)
   }
 
   return (
@@ -100,26 +141,51 @@ export function ScriptFieldEditor({
               <Sparkles className="h-4 w-4" />
             </button>
 
-            {/* Save */}
-            <Button
-              onClick={() => void onSave(scriptType, viewMode, draft.trim())}
-              disabled={!draft.trim() || !hasDraftChanges || isSaving}
-              className="h-10 rounded-full px-4"
-              icon={<Save className="h-4 w-4" />}
-            >
-              {isSaving ? 'Salvando...' : 'Salvar'}
-            </Button>
+            {/* Edit / Save / Cancel */}
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full border border-black/10 bg-white px-4 text-[0.82rem] font-medium text-[#444] transition-colors hover:border-black/20 hover:bg-[#f7f7f5]"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Cancelar
+                </button>
+                <Button
+                  onClick={() => void handleSave()}
+                  disabled={!draft.trim() || !hasDraftChanges || isSaving}
+                  className="h-10 rounded-full px-4"
+                  icon={<Save className="h-4 w-4" />}
+                >
+                  {isSaving ? 'Salvando...' : 'Salvar'}
+                </Button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={handleStartEdit}
+                className="inline-flex h-10 items-center gap-1.5 rounded-full border border-black/10 bg-white px-4 text-[0.82rem] font-medium text-[#444] transition-colors hover:border-black/20 hover:bg-[#f7f7f5]"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Textarea */}
-        <textarea
-          key={`${topic.id}-${scriptType}-${viewMode}`}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          rows={16}
-          className="min-h-[440px] w-full resize-y rounded-[18px] border border-black/10 bg-[#fbfbfa] px-5 py-4 font-body text-[0.98rem] leading-7 text-[#181818] outline-none transition-colors placeholder:text-[#8f8f8f] focus:border-black/25 focus:bg-white"
-        />
+        {/* Content */}
+        {isEditing ? (
+          <textarea
+            key={`${topic.id}-${scriptType}-${viewMode}`}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            rows={16}
+            className="min-h-[440px] w-full resize-y rounded-[18px] border border-black/10 bg-[#fbfbfa] px-5 py-4 font-body text-[0.98rem] leading-7 text-[#181818] outline-none transition-colors placeholder:text-[#8f8f8f] focus:border-black/25 focus:bg-white"
+          />
+        ) : (
+          <ScriptReadView content={currentContent} />
+        )}
       </div>
 
       <TopicAiRefineDialog
