@@ -1,4 +1,4 @@
-import type { ContentTopic, ScriptType, ScriptView } from '../../../../shared/types/account-types'
+import type { ContentTopic, ScriptType, ScriptView, ScriptViewMode } from '../../../../shared/types/account-types'
 import { ScriptFieldEditor } from './script-field-editor'
 
 type TopicScriptEditorProps = {
@@ -9,6 +9,7 @@ type TopicScriptEditorProps = {
   isRefiningSimplified: boolean
   onSave: (scriptType: ScriptType, view: ScriptView, script: string) => Promise<void>
   onRefine: (scriptType: ScriptType, userPrompt: string) => Promise<void>
+  onUpdateViewMode: (scriptType: ScriptType, viewMode: ScriptViewMode) => Promise<void>
 }
 
 export function TopicScriptEditor({
@@ -19,6 +20,7 @@ export function TopicScriptEditor({
   isRefiningSimplified,
   onSave,
   onRefine,
+  onUpdateViewMode,
 }: TopicScriptEditorProps) {
   return (
     <div className="space-y-6">
@@ -30,6 +32,7 @@ export function TopicScriptEditor({
         isRefining={isRefiningStrategic}
         onSave={onSave}
         onRefine={onRefine}
+        onUpdateViewMode={onUpdateViewMode}
       />
       <ScriptFieldEditor
         key={`${topic.id}-simplified`}
@@ -39,6 +42,7 @@ export function TopicScriptEditor({
         isRefining={isRefiningSimplified}
         onSave={onSave}
         onRefine={onRefine}
+        onUpdateViewMode={onUpdateViewMode}
       />
     </div>
   )

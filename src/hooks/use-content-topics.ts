@@ -9,6 +9,7 @@ import type {
   ContentTopicMetrics,
   ScriptType,
   ScriptView,
+  ScriptViewMode,
   UpdateContentTopicInput,
 } from '../shared/types/account-types'
 
@@ -373,12 +374,28 @@ export function useContentTopicDetail({ userId, topicId }: { userId?: string; to
     },
   })
 
+  const updateViewModeMutation = useMutation<
+    ContentTopic,
+    Error,
+    { scriptType: ScriptType; viewMode: ScriptViewMode }
+  >({
+    mutationFn: ({ scriptType, viewMode }) => {
+      if (!userId || !topicId) throw new Error('ID do usuário e ID do topico são obrigatórios')
+      return contentTopicsService.updateViewMode({ userId, topicId, scriptType, viewMode })
+    },
+    onSuccess: (updatedTopic) => {
+      queryClient.setQueryData<ContentTopic>(['content-topics', userId, topicId], updatedTopic)
+      updateTopicInCachedLists(userId, updatedTopic)
+    },
+  })
+
   return {
     topicQuery,
     updateTopicMutation,
     updateScriptMutation,
     updateFieldScriptMutation,
     refineScriptMutation,
+    updateViewModeMutation,
     resetScriptMutation,
     markDoneMutation,
     markPendingMutation,

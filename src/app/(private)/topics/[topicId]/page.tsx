@@ -39,6 +39,7 @@ export function TopicDetailsPage() {
     updateTopicMutation,
     updateFieldScriptMutation,
     refineScriptMutation,
+    updateViewModeMutation,
     markDoneMutation,
     markPendingMutation,
     addGroupMutation,
@@ -63,6 +64,10 @@ export function TopicDetailsPage() {
 
   async function handleRefineScript(scriptType: ScriptType, userPrompt: string): Promise<void> {
     await refineScriptMutation.mutateAsync({ scriptType, userPrompt })
+  }
+
+  async function handleUpdateViewMode(scriptType: ScriptType, viewMode: 'original' | 'refined'): Promise<void> {
+    await updateViewModeMutation.mutateAsync({ scriptType, viewMode })
   }
 
   async function handleDeleteTopic(): Promise<void> {
@@ -123,6 +128,7 @@ export function TopicDetailsPage() {
               }
               onSave={handleSaveFieldScript}
               onRefine={handleRefineScript}
+              onUpdateViewMode={handleUpdateViewMode}
             />
 
             <aside className="space-y-4">

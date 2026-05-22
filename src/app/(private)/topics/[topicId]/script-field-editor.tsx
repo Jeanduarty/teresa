@@ -1,8 +1,8 @@
-import { RotateCcw, Save, Sparkles, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Save, Sparkles, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { Button } from '../../../../components/ui'
-import type { ContentTopic, ScriptType } from '../../../../shared/types/account-types'
+import type { ContentTopic, ScriptType, ScriptViewMode } from '../../../../shared/types/account-types'
 import { TopicAiRefineDialog } from './topic-ai-refine-dialog'
 
 type ScriptFieldEditorProps = {
@@ -12,6 +12,7 @@ type ScriptFieldEditorProps = {
   isRefining: boolean
   onSave: (scriptType: ScriptType, view: 'original' | 'refined', script: string) => Promise<void>
   onRefine: (scriptType: ScriptType, userPrompt: string) => Promise<void>
+  onUpdateViewMode: (scriptType: ScriptType, viewMode: ScriptViewMode) => Promise<void>
 }
 
 const TITLE: Record<ScriptType, string> = {
@@ -31,45 +32,32 @@ export function ScriptFieldEditor({
   isRefining,
   onSave,
   onRefine,
+  onUpdateViewMode,
 }: ScriptFieldEditorProps) {
   const originalContent =
     scriptType === 'strategic' ? topic.strategicScript : topic.simplifiedScript
   const refinedContent =
     scriptType === 'strategic' ? topic.strategicRefined : topic.simplifiedRefined
+  const viewMode =
+    scriptType === 'strategic' ? topic.strategicViewMode : topic.simplifiedViewMode
 
-  // State machine: 'original' | 'refined'
-  // refined !== null means AI was already used
-  const [view, setView] = useState<'original' | 'refined'>(() =>
-    refinedContent !== null ? 'refined' : 'original',
-  )
-  // toggleRevealed: after clicking "undo" in the refined view, the toggle appears
-  const [toggleRevealed, setToggleRevealed] = useState(false)
   const [aiDialogOpen, setAiDialogOpen] = useState(false)
 
-  const currentContent = view === 'refined' && refinedContent !== null ? refinedContent : originalContent
+  const currentContent = viewMode === 'refined' && refinedContent !== null ? refinedContent : originalContent
   const [draft, setDraft] = useState(currentContent)
   const hasDraftChanges = useMemo(() => draft !== currentContent, [draft, currentContent])
 
   const isRefined = refinedContent !== null
-  // AI button: disabled once refined
   const aiButtonDisabled = isRefined
 
-  function handleViewChange(newView: 'original' | 'refined') {
-    setView(newView)
-    setDraft(newView === 'refined' && refinedContent !== null ? refinedContent : originalContent)
-  }
-
-  function handleUndo() {
-    setToggleRevealed(true)
-    handleViewChange('original')
+  async function handleSwitchChange() {
+    const newMode: ScriptViewMode = viewMode === 'refined' ? 'original' : 'refined'
+    await onUpdateViewMode(scriptType, newMode)
+    setDraft(newMode === 'refined' && refinedContent !== null ? refinedContent : originalContent)
   }
 
   async function handleRefine(userPrompt: string) {
     await onRefine(scriptType, userPrompt)
-    // After successful refine, switch to refined view
-    setView('refined')
-    setDraft(refinedContent ?? draft)
-    setToggleRevealed(false)
   }
 
   return (
@@ -85,32 +73,20 @@ export function ScriptFieldEditor({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* Toggle (appears after undo) */}
-            {isRefined && toggleRevealed && (
+            {/* Switch (only shows if refined) */}
+            {isRefined && (
               <button
                 type="button"
-                onClick={() => handleViewChange(view === 'original' ? 'refined' : 'original')}
+                onClick={() => void handleSwitchChange()}
                 className="inline-flex h-10 items-center gap-1.5 rounded-full border border-black/10 bg-white px-4 text-[0.82rem] font-medium text-[#444] transition-colors hover:border-black/20 hover:bg-[#f7f7f5]"
               >
-                {view === 'refined' ? (
+                {viewMode === 'refined' ? (
                   <ToggleRight className="h-4 w-4 text-violet-500" />
                 ) : (
                   <ToggleLeft className="h-4 w-4 text-[#aaa]" />
                 )}
-                {view === 'refined' ? 'Ver original' : 'Ver versão IA'}
+                {viewMode === 'refined' ? 'Versão com IA' : 'Versão original'}
               </button>
-            )}
-
-            {/* Undo (shows in refined view before toggle is revealed) */}
-            {isRefined && !toggleRevealed && view === 'refined' && (
-              <Button
-                variant="secondary"
-                className="h-10 rounded-full px-4"
-                onClick={handleUndo}
-                icon={<RotateCcw className="h-4 w-4" />}
-              >
-                Desfazer
-              </Button>
             )}
 
             {/* AI button */}
@@ -126,7 +102,7 @@ export function ScriptFieldEditor({
 
             {/* Save */}
             <Button
-              onClick={() => void onSave(scriptType, view, draft.trim())}
+              onClick={() => void onSave(scriptType, viewMode, draft.trim())}
               disabled={!draft.trim() || !hasDraftChanges || isSaving}
               className="h-10 rounded-full px-4"
               icon={<Save className="h-4 w-4" />}
@@ -136,24 +112,9 @@ export function ScriptFieldEditor({
           </div>
         </div>
 
-        {/* View badge */}
-        {isRefined && (
-          <div className="mb-3 flex items-center gap-1.5">
-            <span
-              className={`inline-flex h-5 items-center rounded-full px-2 text-[0.7rem] font-semibold ${
-                view === 'refined'
-                  ? 'bg-violet-100 text-violet-700'
-                  : 'bg-[#f0f0ee] text-[#888]'
-              }`}
-            >
-              {view === 'refined' ? 'Versão IA' : 'Original'}
-            </span>
-          </div>
-        )}
-
         {/* Textarea */}
         <textarea
-          key={`${topic.id}-${scriptType}-${view}`}
+          key={`${topic.id}-${scriptType}-${viewMode}`}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={16}

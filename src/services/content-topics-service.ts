@@ -7,6 +7,7 @@ import type {
   LinkPreview,
   ScriptType,
   ScriptView,
+  ScriptViewMode,
   UpdateContentTopicInput,
 } from '../shared/types/account-types'
 
@@ -183,6 +184,23 @@ export const contentTopicsService = {
     const { topic } = await apiRequest<{ topic: ContentTopic }>(
       `/topics/${topicId}/script/refine`,
       { method: 'POST', body: { scriptType, userPrompt } },
+    )
+    return topic
+  },
+
+  async updateViewMode({
+    topicId,
+    scriptType,
+    viewMode,
+  }: {
+    userId: string
+    topicId: string
+    scriptType: ScriptType
+    viewMode: ScriptViewMode
+  }): Promise<ContentTopic> {
+    const { topic } = await apiRequest<{ topic: ContentTopic }>(
+      `/topics/${topicId}/script/view-mode`,
+      { method: 'PATCH', body: { scriptType, viewMode } },
     )
     return topic
   },

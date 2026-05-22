@@ -212,6 +212,7 @@ export interface SocialAccount {
 
 export type ScriptType = 'strategic' | 'simplified'
 export type ScriptView = 'original' | 'refined'
+export type ScriptViewMode = 'original' | 'refined'
 
 export interface ContentTopic {
   id: string
@@ -219,12 +220,12 @@ export interface ContentTopic {
   groups: ContentTopicGroupSummary[]
   title: string
   summary: string
-  originalScript: string
-  currentScript: string
   strategicScript: string
   simplifiedScript: string
   strategicRefined: string | null
   simplifiedRefined: string | null
+  strategicViewMode: ScriptViewMode
+  simplifiedViewMode: ScriptViewMode
   editedAt: string | null
   sourceProvider: SocialProvider
   status: ContentTopicStatus
