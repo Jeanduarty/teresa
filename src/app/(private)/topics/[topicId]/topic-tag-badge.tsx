@@ -7,8 +7,11 @@ type TopicTagBadgeProps = {
 
 export function TopicTagBadge({ tag, onRemove }: TopicTagBadgeProps) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-[#f4f4f2] px-3 py-1.5 text-xs font-semibold text-[#666]">
-      <span className="truncate">{tag}</span>
+    <span
+      className="inline-flex max-w-full items-center gap-2 rounded-full border border-black/10 bg-[#f4f4f2] px-3 py-1.5 text-xs font-semibold text-[#666]"
+      title={tag}
+    >
+      <span className="min-w-0 max-w-[220px] truncate">{tag}</span>
       {onRemove ? (
         <button
           type="button"
