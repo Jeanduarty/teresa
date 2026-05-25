@@ -356,6 +356,7 @@ export function HomePage() {
             </p>
             <div className="mt-5">
               <Button
+                size='sm'
                 icon={<ArrowRight className="h-4 w-4" />}
                 onClick={() => setIdeaDialogOpen(true)}
               >
