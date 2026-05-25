@@ -112,15 +112,19 @@ export function useContentTopics(userId?: string, filters?: ContentTopicFilters)
     enabled: Boolean(userId),
   })
 
-  const markDoneMutation = useMutation<ContentTopic, Error, string>({
-    mutationFn: (topicId) => {
+  const markDoneMutation = useMutation<
+    ContentTopic,
+    Error,
+    { topicId: string; publishedUrl?: string | null; publishedAt?: string | null }
+  >({
+    mutationFn: ({ topicId, publishedUrl, publishedAt }) => {
       if (!userId) {
         throw new Error('ID do usuário é obrigatório')
       }
 
-      return contentTopicsService.markTopicDone({ userId, topicId })
+      return contentTopicsService.markTopicDone({ userId, topicId, publishedUrl, publishedAt })
     },
-    onSuccess: (updatedTopic, topicId) => {
+    onSuccess: (updatedTopic, { topicId }) => {
       const previousTopic = getCachedTopic(userId, topicId)
       queryClient.setQueryData<ContentTopic>(['content-topics', userId, updatedTopic.id], updatedTopic)
       updateTopicInCachedLists(userId, updatedTopic)
@@ -265,13 +269,22 @@ export function useContentTopicDetail({ userId, topicId }: { userId?: string; to
     },
   })
 
-  const markDoneMutation = useMutation<ContentTopic, Error, void>({
-    mutationFn: () => {
+  const markDoneMutation = useMutation<
+    ContentTopic,
+    Error,
+    { publishedUrl?: string | null; publishedAt?: string | null } | void
+  >({
+    mutationFn: (input) => {
       if (!userId || !topicId) {
         throw new Error('ID do usuário e ID do topico são obrigatórios')
       }
 
-      return contentTopicsService.markTopicDone({ userId, topicId })
+      return contentTopicsService.markTopicDone({
+        userId,
+        topicId,
+        publishedUrl: input?.publishedUrl,
+        publishedAt: input?.publishedAt,
+      })
     },
     onSuccess: (updatedTopic) => {
       const previousTopic = getCachedTopic(userId, topicId ?? updatedTopic.id)

@@ -218,9 +218,105 @@ export interface RevokeSessionResult {
   shouldLogout: boolean
 }
 
-export type SocialProvider = 'twitter' | 'tiktok'
+export type SocialProvider = 'twitter' | 'tiktok' | 'idea'
 export type ContentTopicStatus = 'pending' | 'completed' | 'deleted'
 export type ContentTopicStatusFilter = 'pending' | 'completed' | 'all'
+
+export type IdeaSession = {
+  rawIdea: string
+  conversation: Array<{ question: string; answer: string }>
+  references: Array<{
+    url: string | null
+    title: string | null
+    platform: string | null
+    creatorHandle: string | null
+    note: string | null
+  }>
+}
+
+export type GenerationContext = {
+  source: 'daily' | 'idea'
+  hadCreatorProfile: boolean
+  profileVersion: number | null
+  profileConfidence: 'low' | 'medium' | 'high' | null
+  hadUserDirection: boolean
+  hadManualAdjustments: boolean
+  signalsAnalyzedCount: number
+  conversationTurns: number
+  referencesProvided: number
+}
+
+export type CreatorProfileFieldKey =
+  | 'niche'
+  | 'communicationStyle'
+  | 'perceivedAudience'
+  | 'retentionMechanism'
+  | 'uniqueAngle'
+  | 'contentConstraints'
+
+export type CreatorProfileSnapshotSource =
+  | 'inferred'
+  | 'manual'
+  | 'new_direction'
+  | 'reset'
+  | 'restored'
+
+export interface CreatorProfile {
+  id: string
+  userId: string
+  niche: string | null
+  communicationStyle: string | null
+  perceivedAudience: string | null
+  retentionMechanism: string | null
+  uniqueAngle: string | null
+  contentConstraints: string | null
+  userDirection: string | null
+  summary: string | null
+  confidence: 'low' | 'medium' | 'high' | null
+  currentVersion: number
+  signalsAnalyzedCount: number
+  lastInferredAt: string | null
+  hasManualAdjustments: boolean
+  readyForInference: boolean
+  availableSignalsCount: number
+  divergenceFromPrevious: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreatorProfileSnapshot {
+  id: string
+  version: number
+  source: CreatorProfileSnapshotSource
+  description: string
+  signalsAnalyzedCount: number
+  createdAt: string
+  data: {
+    niche: string | null
+    communicationStyle: string | null
+    perceivedAudience: string | null
+    retentionMechanism: string | null
+    uniqueAngle: string | null
+    contentConstraints: string | null
+    userDirection: string | null
+    summary: string | null
+    confidence: 'low' | 'medium' | 'high' | null
+    divergenceFromPrevious: string | null
+  }
+}
+
+export interface IdeaConversationTurnInput {
+  question: string
+  answer: string
+}
+
+export interface IdeaReferenceInput {
+  url?: string | null
+  title?: string | null
+  platform?: string | null
+  creatorHandle?: string | null
+  note?: string | null
+}
 
 export type TikTokWebSessionStatus = 'active' | 'expired' | 'pending_login' | 'failed' | null
 
@@ -259,6 +355,8 @@ export interface ContentTopic {
   signals: string[]
   tags: string[]
   topicReferences: TopicReference[]
+  ideaSession: IdeaSession | null
+  generationContext: GenerationContext | null
   generatedAt: string
   completedAt: string | null
 }

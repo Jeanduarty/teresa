@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, LogOut, Newspaper, Settings } from 'lucide-react'
+import { ChevronDown, LogOut, Newspaper, Settings, UserCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { Button } from '../../../components/ui'
@@ -72,19 +72,19 @@ export function PrivateProfileMenu({
           role="menu"
           className="absolute right-0 top-full z-20 mt-4 w-[224px] overflow-hidden rounded-[18px] border border-black/10 bg-white shadow-[0_24px_42px_-28px_rgba(0,0,0,0.34)]"
         >
-          <div className="px-4 py-3.5">
-            <div className="mb-3">
-              <UserAvatar
-                avatarUrl={avatarUrl}
-                name={displayName}
-                className="h-11 w-11"
-                iconClassName="h-5 w-5"
-              />
+          <div className="flex items-center gap-3 px-4 py-3.5">
+            <UserAvatar
+              avatarUrl={avatarUrl}
+              name={displayName}
+              className="h-11 w-11 shrink-0"
+              iconClassName="h-5 w-5"
+            />
+            <div className="min-w-0">
+              <p className="font-heading truncate text-[1.12rem] font-semibold text-[#181818]">{displayName}</p>
+              <p className="font-heading mt-0.5 truncate text-[0.92rem] font-normal text-[#6f6f6f]">
+                @{userName}
+              </p>
             </div>
-            <p className="font-heading text-[1.12rem] font-semibold text-[#181818]">{displayName}</p>
-            <p className="font-heading mt-1 text-[0.92rem] font-normal text-[#6f6f6f]">
-              @{userName}
-            </p>
           </div>
 
           <div className="border-t border-black/10">
@@ -96,6 +96,16 @@ export function PrivateProfileMenu({
             >
               <Newspaper className="h-4 w-4" />
               <span>Novidades</span>
+            </Link>
+
+            <Link
+              to="/creator-profile"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+            >
+              <UserCircle2 className="h-4 w-4" />
+              <span>Como a Teresa te vê</span>
             </Link>
 
             <Link

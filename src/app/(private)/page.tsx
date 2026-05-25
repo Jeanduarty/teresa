@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronLeft } from 'lucide-react'
+import { ArrowRight, AtSign, ChevronLeft, Lightbulb, Music2, Sparkles } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import {
   Button,
   ButtonLink,
+  Card,
   Tabs,
   TabsContent,
   TabsList,
@@ -26,6 +27,8 @@ import { ExploreListPanel } from './explore/_components/explore-list-panel'
 import { GroupDialog } from './home/group-dialog'
 import { GenerateTopicsButton } from './home/generate-topics-button'
 import { GroupsButton } from './home/groups-button'
+import { IdeaDialog } from './home/idea-dialog'
+import { MarkDoneDialog } from './home/mark-done-dialog'
 import { HOME_TABS, type HomeTab } from './home/home-tabs'
 import type {
   GroupDialogState,
@@ -49,6 +52,8 @@ export function HomePage() {
   const avatarQuery = useUserAvatar(user)
   const { uploadMutation: uploadAvatarMutation } = useAvatarUpload()
   const [groupDialogState, setGroupDialogState] = useState<GroupDialogState>(null)
+  const [ideaDialogOpen, setIdeaDialogOpen] = useState(false)
+  const [markDoneTopicId, setMarkDoneTopicId] = useState<string | null>(null)
   const [titleFilter, setTitleFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState<ContentTopicStatusFilter>('all')
   const [tagsFilter, setTagsFilter] = useState('')
@@ -124,7 +129,7 @@ export function HomePage() {
     isMarkingDone: markDoneMutation.isPending,
     isMarkingPending: markPendingMutation.isPending,
     isRemovingFromGroup: removeGroupMutation.isPending,
-    markingDoneTopicId: markDoneMutation.variables,
+    markingDoneTopicId: markDoneMutation.variables?.topicId ?? markDoneTopicId ?? undefined,
     markingPendingTopicId: markPendingMutation.variables,
     removingFromGroup: removeGroupMutation.variables,
   }
@@ -133,7 +138,7 @@ export function HomePage() {
       void addGroupMutation.mutateAsync({ topicId, groupId })
     },
     onMarkDone: (topicId) => {
-      void markDoneMutation.mutateAsync(topicId)
+      setMarkDoneTopicId(topicId)
     },
     onMarkPending: (topicId) => {
       void markPendingMutation.mutateAsync(topicId)
@@ -148,23 +153,20 @@ export function HomePage() {
   const canRunSocialJob =
     (accessQuery.data?.hasConnectedSocialAccount ?? false) &&
     !isProcessing
-  const connectedAccountsCount = accountsQuery.data?.filter((account) => account.isConnected).length ?? 0
+  const connectedSocialAccounts = useMemo(
+    () => (accountsQuery.data ?? []).filter(account => {
+      if (account.provider === 'idea') return false
+      if (account.provider === 'tiktok') return account.webSessionStatus === 'active'
+      return account.isConnected
+    }),
+    [accountsQuery.data],
+  )
+  const connectedAccountsCount = connectedSocialAccounts.length
   const shouldShowSocialShortcut =
     activeTab === 'creator' &&
     !accountsQuery.isLoading &&
     !accountsQuery.error &&
     connectedAccountsCount === 0
-  const socialAccountsLabel = accountsQuery.isLoading
-    ? 'Verificando redes'
-    : connectedAccountsCount === 1
-      ? '1 rede conectada'
-      : `${connectedAccountsCount} redes conectadas`
-  const socialAccountsStatusClassName =
-    !accountsQuery.isLoading && connectedAccountsCount === 0
-      ? 'border-red-200 bg-red-50 text-red-700 hover:border-red-300 hover:text-red-800'
-      : 'border-black/10 bg-white text-[#666] hover:border-black/20 hover:text-[#141414]'
-  const socialAccountsDotClassName =
-    !accountsQuery.isLoading && connectedAccountsCount === 0 ? 'bg-red-500' : 'bg-[#1d9a52]'
 
   useEffect(() => {
     function handleScroll() {
@@ -234,7 +236,7 @@ export function HomePage() {
           <p className="mt-1 text-sm leading-6 text-[#666]">
             {groupContextId
               ? 'Tópicos vinculados a este grupo.'
-              : 'Use os filtros para encontrar ideias por status, titulo ou tags.'}
+              : 'Use os filtros para encontrar ideias por status, título ou tags.'}
           </p>
         </div>
 
@@ -256,17 +258,6 @@ export function HomePage() {
               resetPagination()
             }}
           />
-
-          {!groupContextId ? (
-            <GenerateTopicsButton
-              canRun={canRunSocialJob}
-              isProcessing={isProcessing}
-              isStatusError={statusQuery.isError}
-              cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
-              status={statusQuery.data}
-              onRun={() => runMutation.mutate()}
-            />
-          ) : null}
 
           {!groupContextId ? (
             <FiltersButton
@@ -318,17 +309,82 @@ export function HomePage() {
             </h1>
             <div className="flex flex-wrap items-center gap-3">
               <p className="font-mono text-lg text-[#666]">@{user?.userName ?? 'usuario'}</p>
-              <Link
-                to="/settings/social"
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${socialAccountsStatusClassName}`}
-              >
-                <span className={`h-2 w-2 rounded-full ${socialAccountsDotClassName}`} />
-                {socialAccountsLabel}
-              </Link>
+              {accountsQuery.isLoading ? (
+                <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[#999]">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#ccc]" />
+                  Verificando redes
+                </span>
+              ) : connectedSocialAccounts.length === 0 ? (
+                <Link
+                  to="/settings/social"
+                  className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:border-red-300 hover:text-red-800"
+                >
+                  <span className="h-2 w-2 rounded-full bg-red-500" />
+                  0 redes conectadas
+                </Link>
+              ) : (
+                connectedSocialAccounts.map(account => {
+                  const Icon = account.provider === 'tiktok' ? Music2 : AtSign
+                  const label = account.provider === 'tiktok' ? 'TikTok' : 'X'
+                  return (
+                    <Link
+                      key={account.provider}
+                      to="/settings/social"
+                      className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[#666] transition-colors hover:border-black/20 hover:text-[#141414]"
+                    >
+                      <span className="h-2 w-2 rounded-full bg-[#1d9a52]" />
+                      <Icon className="h-3 w-3" />
+                      {label} conectado
+                    </Link>
+                  )
+                })
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      {activeTab === 'creator' ? (
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Card className="rounded-[20px] p-6">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100">
+              <Lightbulb className="h-6 w-6 text-amber-600" />
+            </div>
+            <h3 className="font-heading text-lg font-semibold text-[#181818]">Tenho uma ideia</h3>
+            <p className="mt-2 text-sm leading-6 text-[#666]">
+              Conte para a Teresa sua ideia inicial e receba perguntas estratégicas para transformá-la em um tópico poderoso.
+            </p>
+            <div className="mt-5">
+              <Button
+                icon={<ArrowRight className="h-4 w-4" />}
+                onClick={() => setIdeaDialogOpen(true)}
+              >
+                Começar agora
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="rounded-[20px] p-6">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#edf7f1]">
+              <Sparkles className="h-6 w-6 text-[#1d9a52]" />
+            </div>
+            <h3 className="font-heading text-lg font-semibold text-[#181818]">Gerar tópicos</h3>
+            <p className="mt-2 text-sm leading-6 text-[#666]">
+              Conecte suas redes e deixa a Teresa analisar o que você consome para sugerir os melhores tópicos.
+            </p>
+            <div className="mt-5">
+              <GenerateTopicsButton
+                canRun={canRunSocialJob}
+                isProcessing={isProcessing}
+                isStatusError={statusQuery.isError}
+                cooldownEndsAt={accessQuery.data?.cooldownEndsAt ?? null}
+                status={statusQuery.data}
+                onRun={() => runMutation.mutate()}
+              />
+            </div>
+          </Card>
+        </div>
+      ) : null}
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="mb-8 flex justify-center">
@@ -391,6 +447,24 @@ export function HomePage() {
           }
 
           return deleteGroupMutation.mutateAsync(groupId)
+        }}
+      />
+
+      <IdeaDialog
+        open={ideaDialogOpen}
+        onOpenChange={setIdeaDialogOpen}
+        userId={user?.id}
+      />
+
+      <MarkDoneDialog
+        open={markDoneTopicId !== null}
+        isPending={markDoneMutation.isPending}
+        onOpenChange={(open) => { if (!open) setMarkDoneTopicId(null) }}
+        onConfirm={(publishedUrl) => {
+          if (!markDoneTopicId) return
+          void markDoneMutation.mutateAsync(
+            { topicId: markDoneTopicId, publishedUrl, publishedAt: new Date().toISOString() },
+          ).then(() => setMarkDoneTopicId(null))
         }}
       />
     </main>

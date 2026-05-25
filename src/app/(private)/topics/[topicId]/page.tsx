@@ -6,6 +6,7 @@ import { ConfirmDialog } from '../../../../components/ui'
 import { useAuthSession } from '../../../../hooks/use-auth'
 import { useContentTopicDetail, useTopicGroups } from '../../../../hooks/use-content-topics'
 import type { ScriptType, ScriptView } from '../../../../shared/types/account-types'
+import { MarkDoneDialog } from '../../../(private)/home/mark-done-dialog'
 import { TopicEditFieldDialog, type EditFieldState } from './topic-edit-field-dialog'
 import { TopicGroupsCard } from './topic-groups-card'
 import { TopicOverview } from './topic-overview'
@@ -49,6 +50,7 @@ export function TopicDetailsPage() {
   const { groupsQuery } = useTopicGroups(user?.id)
   const [editField, setEditField] = useState<EditFieldState>(null)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [markDoneDialogOpen, setMarkDoneDialogOpen] = useState(false)
 
   const topic = topicQuery.data
   const groups = groupsQuery.data ?? []
@@ -97,9 +99,7 @@ export function TopicDetailsPage() {
             isMarkingPending={markPendingMutation.isPending}
             isDeleting={deleteTopicMutation.isPending}
             onEdit={setEditField}
-            onMarkDone={() => {
-              void markDoneMutation.mutateAsync()
-            }}
+            onMarkDone={() => setMarkDoneDialogOpen(true)}
             onMarkPending={() => {
               void markPendingMutation.mutateAsync()
             }}
@@ -190,6 +190,18 @@ export function TopicDetailsPage() {
           />
         </div>
       ) : null}
+
+      <MarkDoneDialog
+        open={markDoneDialogOpen}
+        isPending={markDoneMutation.isPending}
+        onOpenChange={setMarkDoneDialogOpen}
+        onConfirm={(publishedUrl) => {
+          void markDoneMutation.mutateAsync({
+            publishedUrl,
+            publishedAt: new Date().toISOString(),
+          }).then(() => setMarkDoneDialogOpen(false))
+        }}
+      />
     </main>
   )
 }

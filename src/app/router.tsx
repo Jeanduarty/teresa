@@ -3,6 +3,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'r
 
 import { useAuthSession } from '../hooks/use-auth'
 import { PrivateLayout } from './(private)/_components/private-layout'
+import { CreatorProfilePage } from './(private)/creator-profile/page'
 import { ExploreAnalysisPage } from './(private)/explore/[exploreAnalysisId]/page'
 import { ExploreContentDetailPage } from './(private)/explore/[exploreAnalysisId]/contents/[contentId]/page'
 import { ExploreNewAnalysisPage } from './(private)/explore/new/page'
@@ -79,6 +80,7 @@ export function AppRouter() {
           <Route path="/settings" element={<AccountSettingsPage />} />
           <Route path="/settings/:section" element={<AccountSettingsPage />} />
           <Route path="/topics/:topicId" element={<TopicDetailsPage />} />
+          <Route path="/creator-profile" element={<CreatorProfilePage />} />
         </Route>
         <Route
           path="/forgot"

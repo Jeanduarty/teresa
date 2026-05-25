@@ -1,4 +1,4 @@
-import { AtSign, Music2 } from 'lucide-react'
+import { AtSign, Lightbulb, Music2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import type { SocialProvider } from '../../../shared/types/account-types'
@@ -16,6 +16,11 @@ const PROVIDERS: Record<
     label: 'TikTok',
     icon: Music2,
     className: 'border-cyan-200 bg-cyan-50 text-cyan-700',
+  },
+  idea: {
+    label: 'Sua ideia',
+    icon: Lightbulb,
+    className: 'border-amber-200 bg-amber-50 text-amber-700',
   },
 }
 

@@ -4,6 +4,8 @@ import type {
   ContentTopicFilters,
   ContentTopicGroup,
   ContentTopicMetrics,
+  IdeaConversationTurnInput,
+  IdeaReferenceInput,
   LinkPreview,
   ScriptType,
   ScriptView,
@@ -62,9 +64,19 @@ export const contentTopicsService = {
     return preview
   },
 
-  async markTopicDone({ topicId }: { userId: string; topicId: string }): Promise<ContentTopic> {
+  async markTopicDone({
+    topicId,
+    publishedUrl,
+    publishedAt,
+  }: {
+    userId: string
+    topicId: string
+    publishedUrl?: string | null
+    publishedAt?: string | null
+  }): Promise<ContentTopic> {
     const { topic } = await apiRequest<{ topic: ContentTopic }>(`/topics/${topicId}/done`, {
       method: 'PATCH',
+      body: { publishedUrl: publishedUrl ?? null, publishedAt: publishedAt ?? null },
     })
     return topic
   },
@@ -237,5 +249,27 @@ export const contentTopicsService = {
     return apiRequest<{ groupId: string }>(`/topics/groups/${groupId}`, {
       method: 'DELETE',
     })
+  },
+
+  async generateIdeaQuestions(input: {
+    rawIdea: string
+    maxQuestions?: number
+  }): Promise<{ questions: string[] }> {
+    return apiRequest<{ questions: string[] }>('/topics/from-idea/questions', {
+      method: 'POST',
+      body: input,
+    })
+  },
+
+  async generateTopicFromIdea(input: {
+    rawIdea: string
+    conversation: IdeaConversationTurnInput[]
+    references: IdeaReferenceInput[]
+  }): Promise<ContentTopic> {
+    const { topic } = await apiRequest<{ topic: ContentTopic }>('/topics/from-idea', {
+      method: 'POST',
+      body: input,
+    })
+    return topic
   },
 }

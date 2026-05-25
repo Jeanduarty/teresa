@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { AtSign, Link2, Music2, RefreshCw, Unplug } from 'lucide-react'
+import { AtSign, Lightbulb, Link2, Music2, RefreshCw, Unplug } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 
 import { useSocialAccounts } from '../../../hooks/use-social-accounts'
@@ -33,6 +33,12 @@ const PROVIDER_LABELS: Record<
     icon: Music2,
     accentClassName: 'bg-cyan-500',
     iconClassName: 'bg-cyan-50 text-cyan-700 ring-cyan-200',
+  },
+  idea: {
+    label: 'Sua ideia',
+    icon: Lightbulb,
+    accentClassName: 'bg-amber-500',
+    iconClassName: 'bg-amber-50 text-amber-700 ring-amber-200',
   },
 }
 
