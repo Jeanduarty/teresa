@@ -297,7 +297,7 @@ export function GenerateTopicsButton({
           <Button
             variant="secondary"
             size="sm"
-            className="my-auto rounded-full"
+            className='rounded-full'
             icon={
               isProcessing
                 ? <Loader2 className="h-4 w-4 animate-spin" />

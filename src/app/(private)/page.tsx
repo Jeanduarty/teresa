@@ -357,7 +357,8 @@ export function HomePage() {
             <div className="mt-5">
               <Button
                 size='sm'
-                icon={<ArrowRight className="h-4 w-4" />}
+                className='rounded-full'
+                icon={<ArrowRight className="size-4" />}
                 onClick={() => setIdeaDialogOpen(true)}
               >
                 Começar agora

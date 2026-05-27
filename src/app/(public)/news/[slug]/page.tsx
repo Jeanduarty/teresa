@@ -79,7 +79,7 @@ function SectionRenderer({ section }: { section: NovidadeSection }) {
 function NovidadeCard({ entry }: { entry: Novidade }) {
   return (
     <Link
-      to={`/novidades/${entry.slug}`}
+      to={`/news/${entry.slug}`}
       className="group flex h-full flex-col rounded-[20px] border border-black/10 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_18px_44px_-32px_rgba(0,0,0,0.4)]"
     >
       <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -111,7 +111,7 @@ export function NovidadeDetailPage() {
   const entry = slug ? getNovidadeBySlug(slug) : null
 
   if (!entry) {
-    return <Navigate to="/novidades" replace />
+    return <Navigate to="/news" replace />
   }
 
   const index = NOVIDADES.findIndex((item) => item.slug === entry.slug)
@@ -120,10 +120,10 @@ export function NovidadeDetailPage() {
   const nextEntry = index > 0 ? NOVIDADES[index - 1] : undefined
 
   return (
-    <NovidadePageShell activePath="novidades">
+    <NovidadePageShell activePath="news">
       <main className="mx-auto w-full max-w-[760px] px-6 py-10 md:px-0 md:py-16">
         <Link
-          to="/novidades"
+          to="/news"
           className="inline-flex items-center gap-2 text-sm font-semibold text-[#666] transition-colors hover:text-[#141414]"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -188,7 +188,7 @@ export function NovidadeDetailPage() {
           >
             {previousEntry ? (
               <Link
-                to={`/novidades/${previousEntry.slug}`}
+                to={`/news/${previousEntry.slug}`}
                 className="group rounded-[18px] border border-black/10 bg-white p-4 transition-all hover:border-black/20 hover:shadow-sm"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888]">
@@ -204,7 +204,7 @@ export function NovidadeDetailPage() {
 
             {nextEntry ? (
               <Link
-                to={`/novidades/${nextEntry.slug}`}
+                to={`/news/${nextEntry.slug}`}
                 className="group rounded-[18px] border border-black/10 bg-white p-4 text-right transition-all hover:border-black/20 hover:shadow-sm"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888]">

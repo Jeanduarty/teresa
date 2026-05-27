@@ -47,7 +47,7 @@ export function TopicDetailsPage() {
     removeGroupMutation,
     deleteTopicMutation,
   } = useContentTopicDetail({ userId: user?.id, topicId })
-  const { groupsQuery } = useTopicGroups(user?.id)
+  const { groupsQuery, createGroupMutation } = useTopicGroups(user?.id)
   const [editField, setEditField] = useState<EditFieldState>(null)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [markDoneDialogOpen, setMarkDoneDialogOpen] = useState(false)
@@ -143,8 +143,13 @@ export function TopicDetailsPage() {
                 groups={groups}
                 isAdding={addGroupMutation.isPending}
                 isRemoving={removeGroupMutation.isPending}
+                isCreating={createGroupMutation.isPending}
                 onAdd={(groupId) => addGroupMutation.mutateAsync(groupId)}
                 onRemove={(groupId) => removeGroupMutation.mutateAsync(groupId)}
+                onCreateGroup={async (name) => {
+                  const newGroup = await createGroupMutation.mutateAsync(name)
+                  await addGroupMutation.mutateAsync(newGroup.id)
+                }}
               />
             </aside>
           </section>

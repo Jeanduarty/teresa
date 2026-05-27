@@ -13,9 +13,9 @@ import { TopicDetailsPage } from './(private)/topics/[topicId]/page'
 import { ForgotPasswordPage } from './(public)/forgot/page'
 import { LoginPage } from './(public)/login/page'
 import { SignupPage } from './(public)/signup/page'
-import { LegalPage } from './novidades/legal/page'
-import { NovidadeDetailPage } from './novidades/[slug]/page'
-import { NovidadesListPage } from './novidades/page'
+import { LegalPage } from './(public)/news/legal/page'
+import { NovidadeDetailPage } from './(public)/news/[slug]/page'
+import { NovidadesListPage } from './(public)/news/page'
 
 function SessionSync() {
   useAuthSession()
@@ -106,10 +106,12 @@ export function AppRouter() {
             </AuthOnly>
           }
         />
-        <Route path="/novidades" element={<NovidadesListPage />} />
-        <Route path="/novidades/:slug" element={<NovidadeDetailPage />} />
-        <Route path="/public" element={<Navigate to="/novidades" replace />} />
-        <Route path="/app-preview" element={<Navigate to="/novidades" replace />} />
+        <Route path="/news" element={<NovidadesListPage />} />
+        <Route path="/news/:slug" element={<NovidadeDetailPage />} />
+        <Route path="/novidades" element={<Navigate to="/news" replace />} />
+        <Route path="/novidades/:slug" element={<Navigate to="/news" replace />} />
+        <Route path="/public" element={<Navigate to="/news" replace />} />
+        <Route path="/app-preview" element={<Navigate to="/news" replace />} />
         <Route path="/legal/:page" element={<LegalPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
