@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { Button } from '../../../components/ui'
@@ -32,6 +32,12 @@ export function LoginPage() {
   })
   const [step, setStep] = useState<LoginStep>('identifier')
   const [submittedStep, setSubmittedStep] = useState<LoginStep | null>(null)
+
+  useEffect(() => {
+    if (step === 'password') {
+      document.getElementById('login-password')?.focus()
+    }
+  }, [step])
 
   const errors = useMemo(
     () => ({

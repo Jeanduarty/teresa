@@ -1,5 +1,5 @@
 import { Loader2, Sparkles } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 import { Button, Popover, PopoverAnchor, PopoverContent } from '../../../components/ui'
 import type { UserSocialJobProgress, UserSocialJobsStatus } from '../../../shared/types/account-types'
@@ -182,59 +182,30 @@ function ProcessingContent({ status, isStatusError }: { status?: UserSocialJobsS
   )
 }
 
-function CompletedContent({ cooldownEndsAt, status }: { cooldownEndsAt: string; status?: UserSocialJobsStatus }) {
+function CooldownTooltipContent({ cooldownEndsAt }: { cooldownEndsAt: string }) {
   const [remaining, setRemaining] = useState(() => formatCooldownRemaining(cooldownEndsAt))
 
   useEffect(() => {
-    const update = () => setRemaining(formatCooldownRemaining(cooldownEndsAt))
-    const id = setInterval(update, 30_000)
+    const id = setInterval(() => setRemaining(formatCooldownRemaining(cooldownEndsAt)), 30_000)
     return () => clearInterval(id)
   }, [cooldownEndsAt])
 
   return (
-    <div>
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="font-heading text-base font-semibold text-[#181818]">Última execução</h3>
-        {remaining && (
-          <span className="shrink-0 rounded-full bg-[#f4f4f2] px-2 py-0.5 text-[10px] font-semibold text-[#666]">
-            {remaining} restantes
-          </span>
-        )}
-      </div>
-
-      {status ? (
-        <>
-          {status.jobs.length > 0 && (
-            <div className="mb-3 space-y-2">
-              {status.jobs.map(job => (
-                <JobProgressCard key={job.id} job={job} />
-              ))}
-            </div>
-          )}
-
-          {status.generatedTopics > 0 && (
-            <p className="text-[11px] font-semibold text-[#1d9a52]">
-              {status.generatedTopics} {status.generatedTopics === 1 ? 'tópico gerado' : 'tópicos gerados'}
-            </p>
-          )}
-
-          {status.failedJobs > 0 && (
-            <p className="mt-1 text-[11px] text-red-600">
-              {status.failedJobs} {status.failedJobs === 1 ? 'job falhou' : 'jobs falharam'}
-            </p>
-          )}
-
-          {status.errorMessage && (
-            <p className="mt-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600">
-              {status.errorMessage}
-            </p>
-          )}
-        </>
+    <div className="space-y-1">
+      <p className="font-heading text-sm font-semibold text-[#181818]">Em cooldown</p>
+      {remaining ? (
+        <p className="text-xs text-[#666]">
+          Disponível em <span className="font-semibold text-[#141414]">{remaining}</span>.
+        </p>
       ) : (
-        <p className="text-xs text-[#666]">Execute novamente para ver os resultados aqui.</p>
+        <p className="text-xs text-[#666]">Disponível em instantes.</p>
       )}
     </div>
   )
+}
+
+function SimpleTooltipContent({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs leading-5 text-[#666]">{children}</p>
 }
 
 export function GenerateTopicsButton({
@@ -250,15 +221,12 @@ export function GenerateTopicsButton({
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
-    if (!cooldownEndsAt) {
-      return
-    }
+    if (!cooldownEndsAt) return
     const id = setInterval(() => setNow(Date.now()), 30_000)
     return () => clearInterval(id)
   }, [cooldownEndsAt])
 
   const isInCooldown = !!cooldownEndsAt && new Date(cooldownEndsAt).getTime() > now
-  const hasTooltip = isProcessing || isInCooldown
 
   function cancelClose() {
     if (closeTimerRef.current) {
@@ -269,7 +237,7 @@ export function GenerateTopicsButton({
 
   function handleMouseEnter() {
     cancelClose()
-    if (hasTooltip) setOpen(true)
+    setOpen(true)
   }
 
   function handleMouseLeave() {
@@ -277,17 +245,34 @@ export function GenerateTopicsButton({
   }
 
   useEffect(() => {
-    return () => {
-      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
-    }
+    return () => { if (closeTimerRef.current) clearTimeout(closeTimerRef.current) }
   }, [])
 
+  // Determina o conteúdo do tooltip por ordem de prioridade
+  function renderTooltipContent() {
+    if (isProcessing) {
+      return <ProcessingContent status={status} isStatusError={isStatusError} />
+    }
+    if (isInCooldown && cooldownEndsAt) {
+      return <CooldownTooltipContent cooldownEndsAt={cooldownEndsAt} />
+    }
+    if (!canRun) {
+      return (
+        <SimpleTooltipContent>
+          Conecte uma rede social para poder gerar tópicos automaticamente.
+        </SimpleTooltipContent>
+      )
+    }
+    return (
+      <SimpleTooltipContent>
+        Gera tópicos a partir dos posts curtidos nas suas redes sociais conectadas.
+      </SimpleTooltipContent>
+    )
+  }
+
   return (
-    <Popover open={open && hasTooltip} onOpenChange={setOpen}>
-      {/*
-        PopoverAnchor wraps the button div so hover events fire even when
-        the button is disabled (disabled elements suppress mouse events).
-      */}
+    <Popover open={open} onOpenChange={setOpen}>
+      {/* PopoverAnchor captura hover mesmo quando o botão está disabled */}
       <PopoverAnchor asChild>
         <div
           className="inline-flex"
@@ -297,7 +282,7 @@ export function GenerateTopicsButton({
           <Button
             variant="secondary"
             size="sm"
-            className='rounded-full'
+            className="rounded-full"
             icon={
               isProcessing
                 ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -313,14 +298,11 @@ export function GenerateTopicsButton({
       <PopoverContent
         align="center"
         side="bottom"
-        className="w-[300px]"
+        className={isProcessing ? 'w-[300px]' : 'w-[240px]'}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {isProcessing || !cooldownEndsAt
-          ? <ProcessingContent status={status} isStatusError={isStatusError} />
-          : <CompletedContent cooldownEndsAt={cooldownEndsAt} status={status} />
-        }
+        {renderTooltipContent()}
       </PopoverContent>
     </Popover>
   )

@@ -65,7 +65,7 @@ export function AppRouter() {
           }
         >
           <Route path="/" element={<HomePage />} />
-          <Route path="/groups" element={<Navigate to="/" replace />} />
+          <Route path="/groups" element={<HomePage />} />
           <Route path="/groups/:groupId" element={<HomePage />} />
           <Route path="/explore" element={<HomePage />} />
           <Route path="/explore/new" element={<ExploreNewAnalysisPage />} />

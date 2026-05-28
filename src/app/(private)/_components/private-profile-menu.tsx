@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, LogOut, Newspaper, Settings, UserCircle2 } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 import { Button } from '../../../components/ui'
@@ -67,72 +68,78 @@ export function PrivateProfileMenu({
         />
       </Button>
 
-      {isOpen ? (
-        <div
-          role="menu"
-          className="absolute right-0 top-full z-20 mt-4 w-[224px] overflow-hidden rounded-[18px] border border-black/10 bg-white shadow-[0_24px_42px_-28px_rgba(0,0,0,0.34)]"
-        >
-          <div className="flex items-center gap-3 px-4 py-3.5">
-            <UserAvatar
-              avatarUrl={avatarUrl}
-              name={displayName}
-              className="h-11 w-11 shrink-0"
-              iconClassName="h-5 w-5"
-            />
-            <div className="min-w-0">
-              <p className="font-heading truncate text-[1.12rem] font-semibold text-[#181818]">{displayName}</p>
-              <p className="font-heading mt-0.5 truncate text-[0.92rem] font-normal text-[#6f6f6f]">
-                @{userName}
-              </p>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            role="menu"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute right-0 top-full z-20 mt-4 w-[224px] overflow-hidden rounded-[18px] border border-black/10 bg-white shadow-[0_24px_42px_-28px_rgba(0,0,0,0.34)]"
+          >
+            <div className="flex items-center gap-3 px-4 py-3.5">
+              <UserAvatar
+                avatarUrl={avatarUrl}
+                name={displayName}
+                className="h-11 w-11 shrink-0"
+                iconClassName="h-5 w-5"
+              />
+              <div className="min-w-0">
+                <p className="font-heading truncate text-[1.12rem] font-semibold text-[#181818]">{displayName}</p>
+                <p className="font-heading mt-0.5 truncate text-[0.92rem] font-normal text-[#6f6f6f]">
+                  @{userName}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="border-t border-black/10">
-            <Link
-              to="/news"
-              role="menuitem"
-              onClick={() => setIsOpen(false)}
-              className="font-heading flex items-center gap-3 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
-            >
-              <Newspaper className="h-4 w-4" />
-              <span>Novidades</span>
-            </Link>
+            <div className="border-t border-black/10">
+              <Link
+                to="/news"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="font-heading flex items-center gap-3 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+              >
+                <Newspaper className="h-4 w-4" />
+                <span>Novidades</span>
+              </Link>
 
-            <Link
-              to="/creator-profile"
-              role="menuitem"
-              onClick={() => setIsOpen(false)}
-              className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
-            >
-              <UserCircle2 className="h-4 w-4" />
-              <span>Como a Teresa te vê</span>
-            </Link>
+              <Link
+                to="/creator-profile"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+              >
+                <UserCircle2 className="h-4 w-4" />
+                <span>Como a Teresa te vê</span>
+              </Link>
 
-            <Link
-              to={settingsHref}
-              role="menuitem"
-              onClick={() => setIsOpen(false)}
-              className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
-            >
-              <Settings className="h-4 w-4" />
-              <span>Configurações</span>
-            </Link>
+              <Link
+                to={settingsHref}
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Configurações</span>
+              </Link>
 
-            <Button
-              role="menuitem"
-              onClick={() => {
-                setIsOpen(false)
-                void onLogout()
-              }}
-              variant="ghost"
-              className="font-heading h-auto w-full justify-start rounded-none border-t border-black/10 px-4 py-3.5 text-left text-[0.98rem] font-medium text-[#181818] hover:bg-[#fafafa]"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Sair</span>
-            </Button>
-          </div>
-        </div>
-      ) : null}
+              <Button
+                role="menuitem"
+                onClick={() => {
+                  setIsOpen(false)
+                  void onLogout()
+                }}
+                variant="ghost"
+                className="font-heading h-auto w-full justify-start rounded-none border-t border-black/10 px-4 py-3.5 text-left text-[0.98rem] font-medium text-[#181818] hover:bg-[#fafafa]"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sair</span>
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

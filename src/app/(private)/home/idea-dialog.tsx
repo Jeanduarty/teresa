@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, Check, Lightbulb, Loader2, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -25,17 +26,23 @@ export function IdeaDialog({
   open,
   onOpenChange,
   userId,
+  initialIdea = '',
+  initialStage = 'idea',
+  initialQuestions = [],
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   userId?: string
+  initialIdea?: string
+  initialStage?: Stage
+  initialQuestions?: string[]
 }) {
   const navigate = useNavigate()
   const { questionsMutation, generateMutation } = useIdeaTopic(userId)
 
-  const [stage, setStage] = useState<Stage>('idea')
-  const [rawIdea, setRawIdea] = useState('')
-  const [questions, setQuestions] = useState<string[]>([])
+  const [stage, setStage] = useState<Stage>(initialStage)
+  const [rawIdea, setRawIdea] = useState(initialIdea)
+  const [questions, setQuestions] = useState<string[]>(initialQuestions)
   const [answers, setAnswers] = useState<AnswerMap>({})
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [references, setReferences] = useState<Reference[]>([])
@@ -43,7 +50,7 @@ export function IdeaDialog({
 
   function reset() {
     setStage('idea')
-    setRawIdea('')
+    setRawIdea(initialIdea)
     setQuestions([])
     setAnswers({})
     setCurrentQuestionIndex(0)
@@ -157,8 +164,16 @@ export function IdeaDialog({
           </div>
         ) : null}
 
+        <AnimatePresence mode="wait">
         {stage === 'idea' && (
-          <div className="space-y-3">
+          <motion.div
+            key="idea"
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="space-y-3"
+          >
             <textarea
               value={rawIdea}
               onChange={(event) => setRawIdea(event.target.value)}
@@ -177,11 +192,18 @@ export function IdeaDialog({
                 {questionsMutation.isPending ? 'Pensando nas perguntas...' : 'Próximo'}
               </Button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {stage === 'questions' && questions.length > 0 && (
-          <div className="space-y-4">
+          <motion.div
+            key="questions"
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="space-y-4"
+          >
             <QuestionProgress
               total={questions.length}
               currentIndex={currentQuestionIndex}
@@ -253,11 +275,18 @@ export function IdeaDialog({
                 </Button>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {stage === 'references' && (
-          <div className="space-y-4">
+          <motion.div
+            key="references"
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="space-y-4"
+          >
             {references.length === 0 ? (
               <p className="rounded-[12px] bg-[#fbfbfa] px-3 py-3 text-xs text-[#666]">
                 Você pode pular essa etapa. As referências entram no contexto e
@@ -310,15 +339,23 @@ export function IdeaDialog({
                 Gerar tópico
               </Button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {stage === 'generating' && (
-          <div className="flex flex-col items-center gap-3 py-10 text-sm text-[#666]">
+          <motion.div
+            key="generating"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="flex flex-col items-center gap-3 py-10 text-sm text-[#666]"
+          >
             <Loader2 className="h-6 w-6 animate-spin" />
             <p>Montando seu tópico a partir da ideia...</p>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </DialogContent>
     </Dialog>
   )
