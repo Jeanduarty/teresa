@@ -41,7 +41,8 @@
 html,
 body,
 #root {
-  min-height: 100svh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 html {
@@ -84,7 +85,8 @@ a {
 }
 
 .app-shell {
-  min-height: 100svh;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--color-surface);
   color: var(--color-muted);
 }

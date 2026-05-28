@@ -123,10 +123,10 @@ export function AuthLayout({
 }: PropsWithChildren<AuthLayoutProps>) {
   if (variant === 'split') {
     return (
-      <div className="app-shell min-h-screen w-screen overflow-hidden">
-        <div className="grid min-h-screen lg:grid-cols-[minmax(460px,52vw)_minmax(0,1fr)]">
-          <section className="flex min-h-screen items-center px-6 py-10 sm:px-10 lg:px-16 xl:px-24">
-            <div className="w-full max-w-[460px]">
+      <div className="app-shell min-h-dvh w-full overflow-x-hidden">
+        <div className="grid min-h-dvh lg:grid-cols-[minmax(460px,52vw)_minmax(0,1fr)]">
+          <section className="flex min-h-dvh items-center justify-center px-6 py-10 sm:px-10 lg:justify-start lg:px-16 xl:px-24">
+            <div className="mx-auto w-full max-w-[460px] lg:mx-0">
               <div className="mb-12 flex justify-start">
                 <Logo
                   imageClassName="h-12 w-12"
@@ -167,7 +167,7 @@ export function AuthLayout({
   }
 
   return (
-    <div className="app-shell flex min-h-screen w-screen items-center justify-center px-4 py-8 sm:px-6">
+    <div className="app-shell flex min-h-dvh w-full items-center justify-center overflow-x-hidden px-4 py-8 sm:px-6">
       <div className="app-panel w-full max-w-[480px] overflow-hidden rounded-[16px]">
         <div className="border-b border-black/10 px-8 py-8 sm:px-10">
           <div className="mb-8 flex justify-center sm:justify-start">

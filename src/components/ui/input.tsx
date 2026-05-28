@@ -36,6 +36,7 @@ export function Input({
   value,
   onChange,
   onBlur,
+  onFocus,
   error = '',
   prefix = null,
   shape = 'rounded',
@@ -57,6 +58,30 @@ export function Input({
         : isDangerTone
           ? 'border-red-200 bg-white focus-within:border-red-300'
           : 'border-black/10 bg-white focus-within:border-black/20'
+
+  const handleFocus: FocusEventHandler<HTMLInputElement> = (event) => {
+    onFocus?.(event)
+
+    if (typeof window === 'undefined' || !window.matchMedia('(pointer: coarse)').matches) {
+      return
+    }
+
+    const input = event.currentTarget
+    const scrollFocusedInputIntoView = () => {
+      if (document.activeElement !== input) {
+        return
+      }
+
+      input.scrollIntoView({
+        block: 'center',
+        inline: 'nearest',
+        behavior: 'smooth',
+      })
+    }
+
+    window.setTimeout(scrollFocusedInputIntoView, 120)
+    window.setTimeout(scrollFocusedInputIntoView, 320)
+  }
 
   return (
     <div className={shape === 'pill' ? 'flex flex-col gap-2' : 'space-y-2'}>
@@ -85,6 +110,7 @@ export function Input({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           onBlur={onBlur}
+          onFocus={handleFocus}
           disabled={disabled}
           className={cn(
             'font-body w-full bg-transparent font-medium text-[#171717] outline-none placeholder:text-[#a0a0a0]',
