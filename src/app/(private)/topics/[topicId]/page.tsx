@@ -66,6 +66,7 @@ export function TopicDetailsPage() {
 
   async function handleRefineScript(scriptType: ScriptType, userPrompt: string): Promise<void> {
     await refineScriptMutation.mutateAsync({ scriptType, userPrompt })
+    await updateViewModeMutation.mutateAsync({ scriptType, viewMode: 'refined' })
   }
 
   async function handleUpdateViewMode(scriptType: ScriptType, viewMode: 'original' | 'refined'): Promise<void> {
