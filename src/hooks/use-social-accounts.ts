@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { socialAccountsService } from '../services/social-accounts-service'
@@ -48,6 +49,29 @@ export function useSocialAccounts(userId?: string) {
       )
     },
   })
+
+  const validateMutation = useMutation<void, Error>({
+    mutationFn: () => socialAccountsService.validateConnections(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['social-accounts', userId] })
+    },
+  })
+
+  const hasTriggeredRef = useRef(false)
+
+  useEffect(() => {
+    if (!accountsQuery.isSuccess || !userId || hasTriggeredRef.current) return
+
+    const hasAnyAccount = (accountsQuery.data?.length ?? 0) > 0
+    if (!hasAnyAccount) return
+
+    const storageKey = `connections-validated:${userId}`
+    if (sessionStorage.getItem(storageKey)) return
+
+    hasTriggeredRef.current = true
+    sessionStorage.setItem(storageKey, '1')
+    validateMutation.mutate()
+  }, [accountsQuery.isSuccess, accountsQuery.data, userId, validateMutation.mutate])
 
   return {
     accountsQuery,

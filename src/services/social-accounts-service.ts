@@ -26,4 +26,8 @@ export const socialAccountsService = {
     })
     return account
   },
+
+  async validateConnections(): Promise<void> {
+    await apiRequest('/social/validate-connections', { method: 'POST' })
+  },
 }

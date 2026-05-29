@@ -330,6 +330,7 @@ export interface SocialAccount {
   permissions: string[]
   webSessionStatus: TikTokWebSessionStatus
   webSessionUpdated: string | null
+  webSessionValidatedAt: string | null
   webHandle: string | null
 }
 
