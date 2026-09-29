@@ -30,7 +30,7 @@ export function ExploreListPanel({
             Minhas análises
           </h2>
           <p className="mt-1 max-w-[640px] text-sm leading-6 text-[#666]">
-            Adicione links de conteúdos do seu nicho ou concorrentes e a IA
+            Adicione links de conteúdos do seu nicho ou concorrentes e a Teresa
             identifica padrões dominantes, hooks recorrentes, posicionamentos e
             oportunidades pouco exploradas.
           </p>

@@ -23,14 +23,14 @@ export const novidade: Novidade = {
     {
       title: 'Oportunidades e tendências',
       description:
-        'A IA aponta lacunas pouco exploradas e sinais de tendência emergente no recorte que você criou.',
+        'A Teresa aponta lacunas pouco exploradas e sinais de tendência emergente no recorte que você criou.',
     },
   ],
   sections: [
     {
       type: 'paragraph',
       text:
-        'Até agora a Teresa partia dos sinais que você já tinha curtido. Com a aba Explorar, dá para fazer o movimento oposto: você escolhe um recorte do mercado (criadores, concorrentes, referências), informa os links e a IA monta um relatório consolidado.',
+        'Até agora a Teresa partia dos sinais que você já tinha curtido. Com a aba Explorar, dá para fazer o movimento oposto: você escolhe um recorte do mercado (criadores, concorrentes, referências), informa os links e a Teresa monta um relatório consolidado.',
     },
     {
       type: 'heading',

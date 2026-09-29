@@ -23,7 +23,7 @@ export const novidade: Novidade = {
       type: 'list',
       items: [
         'Conecte uma rede suportada e dê permissão para a Teresa ler a atividade autorizada.',
-        'A IA agrupa sinais semelhantes em tópicos com referência ao conteúdo original.',
+        'A Teresa agrupa sinais semelhantes em tópicos com referência ao conteúdo original.',
         'Você marca tópicos como pendentes ou feitos conforme transforma em conteúdo.',
         'Tags e grupos organizam os tópicos por projeto, cliente ou linha editorial.',
       ],

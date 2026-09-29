@@ -244,7 +244,7 @@ export function ExploreContentDetailPage() {
       {hasAnalysis ? (
         <section className="rounded-[18px] border border-black/10 bg-white p-5">
           <h2 className="font-heading text-base font-semibold text-[#141414]">
-            Análise da IA
+            Análise
           </h2>
           <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
             {rows
@@ -322,7 +322,7 @@ export function ExploreContentDetailPage() {
         <section className="rounded-[18px] border border-dashed border-black/10 bg-[#fbfbfa] px-4 py-10 text-center">
           <p className="text-sm text-[#888]">
             {isAnalyzing
-              ? 'Aguardando análise da IA. Esta página atualiza automaticamente.'
+              ? 'A análise ainda está em andamento. Esta página atualiza sozinha.'
               : 'Nenhuma análise disponível para este conteúdo.'}
           </p>
         </section>

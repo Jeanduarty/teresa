@@ -158,10 +158,10 @@ export function TopicDetailsPage() {
           <section className="app-panel rounded-[24px] p-6">
             <div className="mb-5">
               <h2 className="font-heading text-2xl font-semibold text-[#141414]">
-                Referencias do topico
+                Referências do tópico
               </h2>
               <p className="mt-2 text-sm leading-6 text-[#666]">
-                Posts e videos que sustentaram a sugestao criada pela IA.
+                Posts e vídeos que deram origem a esta sugestão.
               </p>
             </div>
 

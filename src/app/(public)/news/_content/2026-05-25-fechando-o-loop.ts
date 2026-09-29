@@ -100,7 +100,7 @@ export const novidade: Novidade = {
     {
       type: 'paragraph',
       text:
-        'O menu do perfil ganhou um novo item: "Como a Teresa te vê". Ele leva para a página que mostra o perfil do criador inferido pela IA — nicho, tom de voz, padrões de formato, referências e posicionamento percebido. Antes esse acesso ficava em outro lugar; agora está um clique acima no fluxo principal.',
+        'O menu do perfil ganhou um novo item: "Como a Teresa te vê". Ele leva para a página que mostra o perfil que a Teresa montou a partir do que você consome: nicho, tom de voz, padrões de formato, referências e posicionamento percebido. Antes esse acesso ficava em outro lugar; agora está um clique acima no fluxo principal.',
     },
     {
       type: 'note',

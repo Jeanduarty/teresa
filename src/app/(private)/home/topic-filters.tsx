@@ -104,7 +104,7 @@ function FiltersContent({
         label="Tags"
         value={tags}
         onChange={(value) => onChange({ ...filters, tags: value })}
-        placeholder="IA, futebol, roteiro"
+        placeholder="humor, futebol, roteiro"
       />
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

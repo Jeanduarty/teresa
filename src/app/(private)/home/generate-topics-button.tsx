@@ -97,7 +97,7 @@ function StatCard({
 const PHASE_LABEL: Record<string, string> = {
   collecting: 'Buscando posts curtidos...',
   analyzing: 'Analisando vídeos...',
-  generating_topics: 'Gerando tópicos com IA...',
+  generating_topics: 'Gerando tópicos...',
 }
 
 function AnalysisProgress({ done, total }: { done: number; total: number }) {

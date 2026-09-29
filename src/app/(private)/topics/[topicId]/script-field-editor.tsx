@@ -1,10 +1,10 @@
-import { ExternalLink, Pencil, Save, Sparkles, ToggleLeft, ToggleRight, X } from 'lucide-react'
+import { ExternalLink, Pencil, PenLine, Save, ToggleLeft, ToggleRight, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { Button } from '../../../../components/ui'
 import { splitTextWithLinks } from '../../../../shared/lib/text-links'
 import type { ContentTopic, ScriptType, ScriptViewMode } from '../../../../shared/types/account-types'
-import { TopicAiRefineDialog } from './topic-ai-refine-dialog'
+import { TopicRefineDialog } from './topic-refine-dialog'
 
 type ScriptFieldEditorProps = {
   topic: ContentTopic
@@ -66,7 +66,7 @@ export function ScriptFieldEditor({
   const viewMode =
     scriptType === 'strategic' ? topic.strategicViewMode : topic.simplifiedViewMode
 
-  const [aiDialogOpen, setAiDialogOpen] = useState(false)
+  const [refineDialogOpen, setRefineDialogOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
   const currentContent = viewMode === 'refined' && refinedContent !== null ? refinedContent : originalContent
@@ -74,7 +74,7 @@ export function ScriptFieldEditor({
   const hasDraftChanges = useMemo(() => draft !== currentContent, [draft, currentContent])
 
   const isRefined = refinedContent !== null
-  const aiButtonDisabled = isRefined
+  const refineButtonDisabled = isRefined
 
   function handleStartEdit() {
     setDraft(currentContent)
@@ -126,19 +126,18 @@ export function ScriptFieldEditor({
                 ) : (
                   <ToggleLeft className="h-4 w-4 text-[#aaa]" />
                 )}
-                {viewMode === 'refined' ? 'Versão com IA' : 'Versão original'}
+                {viewMode === 'refined' ? 'Versão refinada' : 'Versão original'}
               </button>
             )}
 
-            {/* AI button */}
             <button
               type="button"
-              disabled={aiButtonDisabled}
-              onClick={() => !aiButtonDisabled && setAiDialogOpen(true)}
-              title={aiButtonDisabled ? 'Refinamento já aplicado' : 'Refinar com IA'}
+              disabled={refineButtonDisabled}
+              onClick={() => !refineButtonDisabled && setRefineDialogOpen(true)}
+              title={refineButtonDisabled ? 'Refinamento já aplicado' : 'Refinar roteiro'}
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-[#666] transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-black/10 disabled:hover:bg-white disabled:hover:text-[#666]"
             >
-              <Sparkles className="h-4 w-4" />
+              <PenLine className="h-4 w-4" />
             </button>
 
             {/* Edit / Save / Cancel */}
@@ -188,11 +187,11 @@ export function ScriptFieldEditor({
         )}
       </div>
 
-      <TopicAiRefineDialog
-        open={aiDialogOpen}
+      <TopicRefineDialog
+        open={refineDialogOpen}
         scriptType={scriptType}
         isRefining={isRefining}
-        onClose={() => setAiDialogOpen(false)}
+        onClose={() => setRefineDialogOpen(false)}
         onRefine={handleRefine}
       />
     </>

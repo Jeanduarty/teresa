@@ -121,7 +121,7 @@ export function ExploreNewAnalysisPage() {
           Criar uma análise
         </h1>
         <p className="mt-2 max-w-[640px] text-sm leading-6 text-[#666]">
-          Adicione links de conteúdos do seu nicho ou concorrentes. A nossa IA
+          Adicione links de conteúdos do seu nicho ou concorrentes. A Teresa
           analisa cada um e identifica padrões, posicionamentos e oportunidades
           de diferenciação.
         </p>

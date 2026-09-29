@@ -53,7 +53,7 @@ export function AnalysisOverview({ analysis }: { analysis: ExploreAnalysis }) {
         ) : (
           <p className="mt-4 rounded-[12px] border border-dashed border-black/10 bg-[#fbfbfa] px-4 py-6 text-sm text-[#888]">
             {isAnalyzing
-              ? 'A IA está analisando os conteúdos. O resumo aparecerá assim que a análise terminar.'
+              ? 'A Teresa está analisando os conteúdos. O resumo aparece assim que ela terminar.'
               : 'Nenhum resumo disponível.'}
           </p>
         )}

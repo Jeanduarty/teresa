@@ -41,7 +41,7 @@ export const novidade: Novidade = {
       items: [
         'Você inicia a geração de tópicos e a Teresa coleta os vídeos curtidos da sua conta conectada do TikTok.',
         'Cada vídeo é analisado em várias camadas: áudio, transcrição, música, cortes de cena, frames, texto na tela e leitura visual.',
-        'A IA resume tudo em uma análise semântica do vídeo, separando tema, emoção, estética, formato, público e fonte principal de retenção.',
+        'A Teresa junta tudo numa análise do vídeo, separando tema, emoção, estética, formato, público e fonte principal de retenção.',
         'Depois disso, a Teresa identifica o DNA viral por trás das referências e gera tópicos originais para o seu feed.',
       ],
     },

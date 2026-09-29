@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react'
+import { PenLine } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '../../../../components/ui'
@@ -11,7 +11,7 @@ import {
 } from '../../../../components/ui/dialog'
 import type { ScriptType } from '../../../../shared/types/account-types'
 
-type TopicAiRefineDialogProps = {
+type TopicRefineDialogProps = {
   open: boolean
   scriptType: ScriptType
   isRefining: boolean
@@ -24,13 +24,13 @@ const LABEL: Record<ScriptType, string> = {
   simplified: 'modo pronto para gravar',
 }
 
-export function TopicAiRefineDialog({
+export function TopicRefineDialog({
   open,
   scriptType,
   isRefining,
   onClose,
   onRefine,
-}: TopicAiRefineDialogProps) {
+}: TopicRefineDialogProps) {
   const [prompt, setPrompt] = useState('')
 
   async function handleSubmit() {
@@ -45,12 +45,12 @@ export function TopicAiRefineDialog({
       <DialogContent className="max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-violet-500" />
-            Refinar com IA
+            <PenLine className="h-4 w-4 text-violet-500" />
+            Refinar roteiro
           </DialogTitle>
           <DialogDescription>
-            Diga à IA o que você quer mudar no {LABEL[scriptType]}. Ela vai aplicar sua instrução
-            e devolver o texto atualizado.
+            Diga à Teresa o que você quer mudar no {LABEL[scriptType]}. Ela aplica sua instrução
+            e devolve o texto atualizado.
           </DialogDescription>
         </DialogHeader>
 
@@ -86,7 +86,7 @@ export function TopicAiRefineDialog({
               className="h-10 rounded-full px-4"
               onClick={handleSubmit}
               disabled={!prompt.trim() || isRefining}
-              icon={<Sparkles className="h-4 w-4" />}
+              icon={<PenLine className="h-4 w-4" />}
             >
               {isRefining ? 'Refinando...' : 'Aplicar'}
             </Button>
