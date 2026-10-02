@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { AtSign, Music2 } from 'lucide-react'
+import { AtSign, Compass, Music2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { ButtonLink } from '../../../components/ui'
 import { UserAvatar } from '../../../components/user-avatar'
 import { useAuthSession } from '../../../hooks/use-auth'
 import { useAvatarUpload } from '../../../hooks/use-avatar-upload'
@@ -76,6 +77,16 @@ export function UserCard() {
               )
             })
           )}
+
+          <ButtonLink
+            to="/creator-profile"
+            variant="outline"
+            size="xs"
+            icon={<Compass className="h-3.5 w-3.5" />}
+            className="rounded-full text-[#666]"
+          >
+            Sua marca
+          </ButtonLink>
         </div>
       </div>
     </section>

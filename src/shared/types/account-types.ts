@@ -261,6 +261,36 @@ export type CreatorProfileSnapshotSource =
   | 'reset'
   | 'restored'
 
+export interface BrandPerceptionGap {
+  title: string
+  description: string
+}
+
+export interface BrandRoadmapStep {
+  horizon: string
+  title: string
+  description: string
+  actions: string[]
+}
+
+export interface BrandFirstMove {
+  title: string
+  description: string
+}
+
+export interface BrandDirection {
+  desiredPerception: string
+  guidingIdea: string
+  startingPoint: string
+  strengths: string[]
+  perceptionGaps: BrandPerceptionGap[]
+  roadmap: BrandRoadmapStep[]
+  firstMoves: BrandFirstMove[]
+  watchOutFor: string[]
+  closingNote: string
+  confidence: 'low' | 'medium' | 'high'
+}
+
 export interface CreatorProfile {
   id: string
   userId: string
@@ -271,6 +301,7 @@ export interface CreatorProfile {
   uniqueAngle: string | null
   contentConstraints: string | null
   userDirection: string | null
+  brandDirection: BrandDirection | null
   summary: string | null
   confidence: 'low' | 'medium' | 'high' | null
   currentVersion: number
@@ -299,6 +330,7 @@ export interface CreatorProfileSnapshot {
     uniqueAngle: string | null
     contentConstraints: string | null
     userDirection: string | null
+    brandDirection: BrandDirection | null
     summary: string | null
     confidence: 'low' | 'medium' | 'high' | null
     divergenceFromPrevious: string | null

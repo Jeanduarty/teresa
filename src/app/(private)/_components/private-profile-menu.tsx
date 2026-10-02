@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, LogOut, Newspaper, Settings, UserCircle2 } from 'lucide-react'
+import { ChevronDown, LogOut, Newspaper, Settings } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
@@ -102,16 +102,6 @@ export function PrivateProfileMenu({
               >
                 <Newspaper className="h-4 w-4" />
                 <span>Novidades</span>
-              </Link>
-
-              <Link
-                to="/creator-profile"
-                role="menuitem"
-                onClick={() => setIsOpen(false)}
-                className="font-heading flex items-center gap-3 border-t border-black/10 px-4 py-3.5 text-[0.98rem] font-medium text-[#181818] transition-colors hover:bg-[#fafafa]"
-              >
-                <UserCircle2 className="h-4 w-4" />
-                <span>Como a Teresa te vê</span>
               </Link>
 
               <Link

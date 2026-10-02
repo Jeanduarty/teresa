@@ -26,6 +26,7 @@ import type {
   CreatorProfileSnapshot,
   CreatorProfileSnapshotSource,
 } from '../../../shared/types/account-types'
+import { BrandDirectionPanel } from './brand-direction-panel'
 
 const FIELDS: Array<{
   key: CreatorProfileFieldKey
@@ -34,48 +35,48 @@ const FIELDS: Array<{
 }> = [
   {
     key: 'niche',
-    label: 'Nicho percebido',
-    description: 'O assunto que parece organizar tudo que você consome.',
+    label: 'Seu território',
+    description: 'O espaço onde seus interesses parecem ganhar mais força.',
   },
   {
     key: 'communicationStyle',
-    label: 'Estilo de comunicação',
-    description: 'O tom e ritmo que você gravita em torno.',
+    label: 'Seu jeito de falar',
+    description: 'O tom e o ritmo que aparecem com mais naturalidade em você.',
   },
   {
     key: 'perceivedAudience',
-    label: 'Público percebido',
-    description: 'Quem esse conteúdo parece servir, em uma frase.',
+    label: 'Com quem você conversa',
+    description: 'As pessoas que parecem encontrar mais valor na sua voz.',
   },
   {
     key: 'retentionMechanism',
-    label: 'O que prende sua atenção',
-    description: 'O gancho recorrente nos conteúdos que você salva.',
+    label: 'O que segura sua atenção',
+    description: 'A força que mais te faz continuar assistindo ou lendo.',
   },
   {
     key: 'uniqueAngle',
-    label: 'Ângulo único',
-    description: 'O que diferencia seu padrão do óbvio do nicho.',
+    label: 'O olhar que é mais seu',
+    description: 'O traço que afasta sua voz do caminho mais óbvio.',
   },
   {
     key: 'contentConstraints',
-    label: 'O que você evita',
-    description: 'Restrições inferidas por ausência. Pode estar vazio.',
+    label: 'O que não combina com você',
+    description: 'Caminhos que parecem enfraquecer a sua presença.',
   },
 ]
 
 const SOURCE_LABEL: Record<CreatorProfileSnapshotSource, string> = {
-  inferred: 'Inferência automática',
-  manual: 'Ajuste manual',
-  new_direction: 'Nova direção',
-  reset: 'Reset',
-  restored: 'Restauração',
+  inferred: 'Leitura da Teresa',
+  manual: 'Ajuste feito por você',
+  new_direction: 'Novo caminho escolhido',
+  reset: 'Recomeço',
+  restored: 'Versão retomada',
 }
 
 const CONFIDENCE_LABEL: Record<'low' | 'medium' | 'high', string> = {
-  low: 'baixa',
-  medium: 'média',
-  high: 'alta',
+  low: 'ainda se formando',
+  medium: 'ganhando clareza',
+  high: 'bem definida',
 }
 
 function formatRelativeDate(iso: string | null): string {
@@ -168,11 +169,11 @@ export function CreatorProfilePage() {
 
       <header className="mb-8 flex flex-col gap-2">
         <h1 className="font-heading text-3xl font-bold text-[#141414]">
-          Como a Teresa te vê
+          Sua direção de marca
         </h1>
         <p className="text-sm leading-6 text-[#666]">
-          Perfil inferido a partir do que você curte e salva. Você pode ajustar,
-          dar nova direção ou pedir uma reinferência a qualquer momento.
+          O que você consome revela pistas sobre a sua voz. Use esse espelho para
+          escolher a presença que deseja construir daqui para frente.
         </p>
       </header>
 
@@ -209,6 +210,7 @@ export function CreatorProfilePage() {
           onReset={() => setResetConfirm(true)}
           isRefreshing={refreshMutation.isPending}
           isResetting={resetMutation.isPending}
+          isApplyingDirection={applyDirectionMutation.isPending}
         />
       )}
 
@@ -248,16 +250,17 @@ export function CreatorProfilePage() {
       <Dialog open={directionOpen} onOpenChange={setDirectionOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Dar nova direção</DialogTitle>
+            <DialogTitle>Que lugar você quer ocupar?</DialogTitle>
             <DialogDescription>
-              Conte em uma frase para onde você quer levar seu conteúdo agora. A
-              Teresa vai usar isso para enviesar as próximas inferências e gerações.
+              Conte como gostaria de ser lembrado quando alguém encontrar o seu
+              conteúdo. Pode escrever do seu jeito: a Teresa vai partir do que já
+              enxerga em você para desenhar esse caminho.
             </DialogDescription>
           </DialogHeader>
           <textarea
             value={directionValue}
             onChange={(event) => setDirectionValue(event.target.value)}
-            placeholder="Ex: quero focar mais em humor agora"
+            placeholder="Ex: quero ser reconhecida como uma referência elegante e próxima para mulheres que desejam se vestir melhor sem perder autenticidade."
             className="min-h-[120px] w-full rounded-[14px] border border-black/10 bg-white p-3 text-sm leading-6 outline-none focus:border-black/30"
           />
           <div className="mt-4 flex justify-end gap-2">
@@ -269,7 +272,7 @@ export function CreatorProfilePage() {
               {applyDirectionMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                'Aplicar direção'
+                'Desenhar meu caminho'
               )}
             </Button>
           </div>
@@ -279,11 +282,11 @@ export function CreatorProfilePage() {
       <Dialog open={resetConfirm} onOpenChange={setResetConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Resetar perfil?</DialogTitle>
+            <DialogTitle>Recomeçar sua leitura?</DialogTitle>
             <DialogDescription>
-              Vamos inferir tudo do zero a partir dos seus sinais atuais. Sua
-              direção e ajustes manuais vão ser limpos. Você ainda pode restaurar
-              versões anteriores pelo histórico.
+              A Teresa vai olhar novamente para as suas referências atuais. O
+              caminho escolhido e os ajustes feitos por você serão limpos, mas
+              ainda poderão ser retomados pelo histórico.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 flex justify-end gap-2">
@@ -302,7 +305,7 @@ export function CreatorProfilePage() {
               {resetMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                'Resetar e reinferir'
+                'Recomeçar leitura'
               )}
             </Button>
           </div>
@@ -312,7 +315,7 @@ export function CreatorProfilePage() {
       <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
         <DialogContent className="max-w-[640px]">
           <DialogHeader>
-            <DialogTitle>Histórico do perfil</DialogTitle>
+            <DialogTitle>Histórico da sua voz</DialogTitle>
             <DialogDescription>
               Cada alteração vira uma versão. Você pode restaurar qualquer uma
               sem perder o histórico atual.
@@ -341,12 +344,12 @@ function ProfileEmptyState({ availableSignalsCount }: { availableSignalsCount: n
   return (
     <div className="rounded-[18px] border border-dashed border-black/15 bg-[#fbfbfa] p-8 text-sm leading-6 text-[#666]">
       <p className="font-heading text-lg font-semibold text-[#141414]">
-        Ainda não há sinais suficientes
+        Ainda faltam algumas referências
       </p>
       <p className="mt-2">
-        Conecte uma rede social e sincronize seus curtidos/salvos. Quando tiver
-        ao menos <strong>10 sinais analisados</strong>, a Teresa consegue inferir
-        seu perfil criativo. Você tem {availableSignalsCount} sinal{availableSignalsCount === 1 ? '' : 's'} disponível{availableSignalsCount === 1 ? '' : 's'} hoje.
+        Conecte uma rede social e sincronize seus curtidos ou salvos. Quando tiver
+        ao menos <strong>10 referências</strong>, a Teresa consegue perceber os
+        primeiros traços da sua voz. Você tem {availableSignalsCount} referência{availableSignalsCount === 1 ? '' : 's'} {availableSignalsCount === 1 ? 'disponível' : 'disponíveis'} hoje.
       </p>
     </div>
   )
@@ -369,11 +372,11 @@ function ProfileFirstRun({
         </span>
         <div className="flex-1">
           <h2 className="font-heading text-xl font-semibold text-[#141414]">
-            Pronto para a primeira inferência
+            Pronta para conhecer melhor a sua voz
           </h2>
           <p className="mt-1 text-sm leading-6 text-[#666]">
-            Você tem {availableSignalsCount} sinais disponíveis para análise.
-            Vamos olhar o padrão e te mostrar como te enxergamos como criador.
+            Você tem {availableSignalsCount} referências disponíveis. Vamos olhar
+            para esse repertório e te mostrar os traços que já aparecem em você.
           </p>
         </div>
       </div>
@@ -383,7 +386,7 @@ function ProfileFirstRun({
         disabled={isPending}
         icon={isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
       >
-        {isPending ? 'Inferindo perfil...' : 'Inferir meu perfil'}
+        {isPending ? 'Conhecendo sua voz...' : 'Descobrir como a Teresa me vê'}
       </Button>
     </div>
   )
@@ -398,6 +401,7 @@ function ProfileMirror({
   onReset,
   isRefreshing,
   isResetting,
+  isApplyingDirection,
 }: {
   profile: CreatorProfile
   onEditField: (field: CreatorProfileFieldKey, value: string | null) => void
@@ -407,16 +411,17 @@ function ProfileMirror({
   onReset: () => void
   isRefreshing: boolean
   isResetting: boolean
+  isApplyingDirection: boolean
 }) {
   return (
     <div className="space-y-5">
       <div className="rounded-[18px] border border-black/10 bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs text-[#666]">
-            Baseado em <strong>{profile.signalsAnalyzedCount}</strong> sinais ·
-            atualizado <strong>{formatRelativeDate(profile.lastInferredAt)}</strong>
+            A Teresa reuniu <strong>{profile.signalsAnalyzedCount}</strong> referências ·
+            olhou novamente <strong>{formatRelativeDate(profile.lastInferredAt)}</strong>
             {profile.confidence ? (
-              <> · confiança <strong>{CONFIDENCE_LABEL[profile.confidence]}</strong></>
+              <> · leitura <strong>{CONFIDENCE_LABEL[profile.confidence]}</strong></>
             ) : null}
           </div>
           <div className="flex gap-2">
@@ -435,7 +440,7 @@ function ProfileMirror({
               onClick={onRefresh}
               disabled={isRefreshing}
             >
-              Reinferir
+              Olhar de novo
             </Button>
           </div>
         </div>
@@ -446,16 +451,10 @@ function ProfileMirror({
 
         {profile.divergenceFromPrevious ? (
           <p className="mt-3 rounded-[12px] bg-[#fff7ea] px-3 py-2 text-xs text-[#8a5a00]">
-            Mudança detectada: {profile.divergenceFromPrevious}
+            O que mudou: {profile.divergenceFromPrevious}
           </p>
         ) : null}
 
-        {profile.userDirection ? (
-          <div className="mt-3 rounded-[12px] bg-[#f4f4f2] px-3 py-2">
-            <p className="text-[11px] uppercase tracking-wide text-[#666]">Sua direção atual</p>
-            <p className="mt-1 text-sm leading-6 text-[#141414]">{profile.userDirection}</p>
-          </div>
-        ) : null}
       </div>
 
       <div className="space-y-3">
@@ -489,18 +488,22 @@ function ProfileMirror({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={onOpenDirection} icon={<Sparkles className="h-4 w-4" />}>
-          Dar nova direção
-        </Button>
         <Button
           variant="ghost"
           onClick={onReset}
           disabled={isResetting}
           icon={<RotateCcw className="h-4 w-4" />}
         >
-          {isResetting ? 'Resetando...' : 'Resetar perfil'}
+          {isResetting ? 'Recomeçando...' : 'Recomeçar leitura'}
         </Button>
       </div>
+
+      <BrandDirectionPanel
+        direction={profile.brandDirection}
+        isPending={isApplyingDirection}
+        userDirection={profile.userDirection}
+        onOpenDirection={onOpenDirection}
+      />
     </div>
   )
 }
